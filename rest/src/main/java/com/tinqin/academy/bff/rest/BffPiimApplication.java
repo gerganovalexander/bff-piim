@@ -1,4 +1,4 @@
-package com.tinqin.academy.bffpiim;
+package com.tinqin.academy.bff.rest;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
