@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.tinqin.academy.bff</groupId>
         <artifactId>BFF-PIIM</artifactId>
-        <version>${revision-bff}</version>
+        <version>${revision}</version>
     </parent>
 
     <artifactId>api</artifactId>

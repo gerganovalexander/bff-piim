@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.tinqin.academy.bff</groupId>
         <artifactId>BFF-PIIM</artifactId>
-        <version>${revision-bff}</version>
+        <version>${revision}</version>
     </parent>
 
     <artifactId>rest</artifactId>
@@ -15,13 +15,13 @@
         <dependency>
             <groupId>com.tinqin.academy.bff</groupId>
             <artifactId>business</artifactId>
-            <version>${revision-bff}</version>
+            <version>${project.version}</version>
         </dependency>
 
         <dependency>
             <groupId>com.tinqin.academy.bff</groupId>
             <artifactId>api</artifactId>
-            <version>${revision-bff}</version>
+            <version>${project.version}</version>
         </dependency>
     </dependencies>
 
@@ -38,6 +38,13 @@
                         </exclude>
                     </excludes>
                 </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
