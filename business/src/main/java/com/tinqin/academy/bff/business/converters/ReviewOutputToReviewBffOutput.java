@@ -1,7 +1,7 @@
 package com.tinqin.academy.bff.business.converters;
 
-import com.tinqin.academy.bff.api.simpleGameSearch.entityoutputmodels.ReviewBffOutput;
-import com.tinqin.academy.bff.api.simpleGameSearch.entityoutputmodels.UserBffOutput;
+import com.tinqin.academy.bff.api.operations.simplegamesearch.entityoutputmodels.ReviewBffOutput;
+import com.tinqin.academy.bff.api.operations.simplegamesearch.entityoutputmodels.UserBffOutput;
 import com.tinqin.academy.piim.api.entityoutputmodels.ReviewOutput;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;

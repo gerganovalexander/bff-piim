@@ -1,4 +1,4 @@
-package com.tinqin.academy.bff.api.simpleGameSearch;
+package com.tinqin.academy.bff.api.operations.simplegamesearch;
 
 import com.tinqin.academy.bff.api.generics.OperationInterface;
 

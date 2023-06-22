@@ -2,11 +2,11 @@ package com.tinqin.academy.bff.business.operations.simplegamesearch;
 
 import com.tinqin.academy.bff.api.erorrzzzz.SimpleGameSearchError;
 import com.tinqin.academy.bff.api.generics.Errorz;
-import com.tinqin.academy.bff.api.simpleGameSearch.SimpleGameSearchInput;
-import com.tinqin.academy.bff.api.simpleGameSearch.SimpleGameSearchOperation;
-import com.tinqin.academy.bff.api.simpleGameSearch.SimpleGameSearchResult;
-import com.tinqin.academy.bff.api.simpleGameSearch.entityoutputmodels.GameBffOutput;
-import com.tinqin.academy.bff.api.simpleGameSearch.entityoutputmodels.ReviewBffOutput;
+import com.tinqin.academy.bff.api.operations.simplegamesearch.SimpleGameSearchInput;
+import com.tinqin.academy.bff.api.operations.simplegamesearch.SimpleGameSearchOperation;
+import com.tinqin.academy.bff.api.operations.simplegamesearch.SimpleGameSearchResult;
+import com.tinqin.academy.bff.api.operations.simplegamesearch.entityoutputmodels.GameBffOutput;
+import com.tinqin.academy.bff.api.operations.simplegamesearch.entityoutputmodels.ReviewBffOutput;
 import com.tinqin.academy.piim.api.entityoutputmodels.ReviewOutput;
 import com.tinqin.academy.piim.api.game.getallbyids.GetAllGamesByIdsInput;
 import com.tinqin.academy.piim.api.game.getallbyids.GetAllGamesByIdsResult;
@@ -31,8 +31,11 @@ public class SimpleGameSearchOperationProcessor implements SimpleGameSearchOpera
     public Either<Errorz, SimpleGameSearchResult> process(final SimpleGameSearchInput input) {
 
         return Try.of(() -> {
-                    GetAllGamesByIdsResult result = piimApiClient.getAllGamesByIds(
-                            new GetAllGamesByIdsInput(input.getIds(), input.getPage(), input.getSize()));
+                    GetAllGamesByIdsResult result = piimApiClient.getAllGamesByIds(GetAllGamesByIdsInput.builder()
+                            .page(input.getPage())
+                            .size(input.getSize())
+                            .ids(input.getIds())
+                            .build());
 
                     return SimpleGameSearchResult.builder()
                             .page(result.getPage())

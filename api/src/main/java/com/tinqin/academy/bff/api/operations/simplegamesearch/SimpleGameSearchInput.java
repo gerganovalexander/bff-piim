@@ -1,4 +1,4 @@
-package com.tinqin.academy.bff.api.simpleGameSearch;
+package com.tinqin.academy.bff.api.operations.simplegamesearch;
 
 import com.tinqin.academy.bff.api.generics.OperationInput;
 import lombok.*;
@@ -11,7 +11,7 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class SimpleGameSearchInput implements OperationInput {
-    Integer page;
-    Integer size;
+    private Integer page;
+    private Integer size;
     private List<Long> ids;
 }
