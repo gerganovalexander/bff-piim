@@ -11,9 +11,7 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class SimpleGameSearchInput implements OperationInput {
-    private List<Long> ids;
-
     Integer page;
-
     Integer size;
+    private List<Long> ids;
 }
