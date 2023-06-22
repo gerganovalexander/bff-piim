@@ -13,7 +13,6 @@ import org.springframework.context.annotation.Configuration;
 @RequiredArgsConstructor
 public class FeignConfig {
 
-
     @Bean(name = "PiimApiClient")
     public PiimApiClient getPiimApiClient() {
         ObjectMapper objectMapper = new ObjectMapper();
@@ -23,5 +22,4 @@ public class FeignConfig {
                 .decoder(new JacksonDecoder(objectMapper))
                 .target(PiimApiClient.class, "http://localhost:8080");
     }
-
 }

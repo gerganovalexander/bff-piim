@@ -1,4 +1,3 @@
 package com.tinqin.academy.bff.api.generics;
 
-public interface OperationResult {
-}
+public interface OperationResult {}

@@ -11,4 +11,3 @@ public abstract class GenericError implements Errorz {
     private final Integer statusCode;
     private final String message;
 }
-

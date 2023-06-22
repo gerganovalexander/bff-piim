@@ -8,9 +8,7 @@ public abstract class BaseController {
 
     protected ResponseEntity<?> handleOperation(final Either<Errorz, ?> result) {
         if (result.isLeft()) {
-            return ResponseEntity
-                    .status(result.getLeft().getStatusCode())
-                    .body(result.getLeft());
+            return ResponseEntity.status(result.getLeft().getStatusCode()).body(result.getLeft());
         }
         return ResponseEntity.status(200).body(result.get());
     }

@@ -20,7 +20,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-
 @RequiredArgsConstructor
 @Service
 public class SimpleGameSearchOperationProcessor implements SimpleGameSearchOperation {
@@ -32,40 +31,41 @@ public class SimpleGameSearchOperationProcessor implements SimpleGameSearchOpera
     public Either<Errorz, SimpleGameSearchResult> process(final SimpleGameSearchInput input) {
 
         return Try.of(() -> {
-                    GetAllGamesByIdsResult result = piimApiClient.getAllGamesByIds(new GetAllGamesByIdsInput(input.getIds(),
-                            input.getPage(),
-                            input.getSize()));
+                    GetAllGamesByIdsResult result = piimApiClient.getAllGamesByIds(
+                            new GetAllGamesByIdsInput(input.getIds(), input.getPage(), input.getSize()));
 
                     return SimpleGameSearchResult.builder()
                             .page(result.getPage())
                             .limit(result.getLimit())
                             .totalItems(result.getTotalItems())
-                            .games(
-                                    result.getGames().stream()
-                                            .map(gameOutput -> GameBffOutput.builder()
-                                                    .id(gameOutput.getId())
-                                                    .name(gameOutput.getName())
-                                                    .description(gameOutput.getAvgReviewDescription())
-                                                    .reviews(getReviewBffOutputs(
-                                                            piimApiClient.getReviewsByGameId(gameOutput.getId()).getReviews()))
-                                                    .build()
-                                            ).toList()
-                            ).build();
-                }
-        ).toEither().mapLeft(throwable -> {
+                            .games(getGameBffOutputs(result))
+                            .build();
+                })
+                .toEither()
+                .mapLeft(throwable -> {
                     if (throwable instanceof RetryableException) {
                         return new SimpleGameSearchError(400, "Failed to connect to external source.");
                     }
                     return new SimpleGameSearchError(400, "Unexpected error.");
-                }
-        );
+                });
+    }
 
+    private List<GameBffOutput> getGameBffOutputs(final GetAllGamesByIdsResult result) {
+        return result.getGames().stream()
+                .map(gameOutput -> GameBffOutput.builder()
+                        .id(gameOutput.getId())
+                        .name(gameOutput.getName())
+                        .description(gameOutput.getAvgReviewDescription())
+                        .reviews(getReviewBffOutputs(piimApiClient
+                                .getReviewsByGameId(gameOutput.getId())
+                                .getReviews()))
+                        .build())
+                .toList();
     }
 
     private List<ReviewBffOutput> getReviewBffOutputs(final List<ReviewOutput> reviews) {
-        return reviews
-                .stream()
-                .map(reviewOutput -> conversionService.convert(reviewOutput, ReviewBffOutput.class)
-                ).toList();
+        return reviews.stream()
+                .map(reviewOutput -> conversionService.convert(reviewOutput, ReviewBffOutput.class))
+                .toList();
     }
 }
