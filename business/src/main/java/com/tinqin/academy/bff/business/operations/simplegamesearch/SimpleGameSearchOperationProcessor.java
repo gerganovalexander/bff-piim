@@ -7,7 +7,6 @@ import com.tinqin.academy.bff.api.simpleGameSearch.SimpleGameSearchOperation;
 import com.tinqin.academy.bff.api.simpleGameSearch.SimpleGameSearchResult;
 import com.tinqin.academy.bff.api.simpleGameSearch.entityoutputmodels.GameBffOutput;
 import com.tinqin.academy.bff.api.simpleGameSearch.entityoutputmodels.ReviewBffOutput;
-import com.tinqin.academy.bff.api.simpleGameSearch.entityoutputmodels.UserBffOutput;
 import com.tinqin.academy.piim.api.entityoutputmodels.ReviewOutput;
 import com.tinqin.academy.piim.api.game.getallbyids.GetAllGamesByIdsInput;
 import com.tinqin.academy.piim.api.game.getallbyids.GetAllGamesByIdsResult;
@@ -16,6 +15,7 @@ import feign.RetryableException;
 import io.vavr.control.Either;
 import io.vavr.control.Try;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.convert.ConversionService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -26,6 +26,7 @@ import java.util.List;
 public class SimpleGameSearchOperationProcessor implements SimpleGameSearchOperation {
 
     private final PiimApiClient piimApiClient;
+    private final ConversionService conversionService;
 
     @Override
     public Either<Errorz, SimpleGameSearchResult> process(final SimpleGameSearchInput input) {
@@ -62,16 +63,9 @@ public class SimpleGameSearchOperationProcessor implements SimpleGameSearchOpera
     }
 
     private List<ReviewBffOutput> getReviewBffOutputs(final List<ReviewOutput> reviews) {
-        return reviews.stream().map(reviewOutput ->
-                ReviewBffOutput.builder()
-                        .id(reviewOutput.getId())
-                        .score(reviewOutput.getScore())
-                        .text(reviewOutput.getText())
-                        .user(UserBffOutput.builder()
-                                .id(reviewOutput.getUser().getId())
-                                .fullName(reviewOutput.getUser().getFullName())
-                                .build())
-                        .build()
-        ).toList();
+        return reviews
+                .stream()
+                .map(reviewOutput -> conversionService.convert(reviewOutput, ReviewBffOutput.class)
+                ).toList();
     }
 }
