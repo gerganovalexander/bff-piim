@@ -8,6 +8,7 @@ import com.tinqin.academy.bff.api.simpleGameSearch.entityoutputmodels.ReviewBffO
 import com.tinqin.academy.bff.api.simpleGameSearch.entityoutputmodels.UserBffOutput;
 import com.tinqin.academy.piim.api.entityoutputmodels.ReviewOutput;
 import com.tinqin.academy.piim.api.game.getallbyids.GetAllGamesByIdsInput;
+import com.tinqin.academy.piim.api.game.getallbyids.GetAllGamesByIdsResult;
 import com.tinqin.academy.piim.restexport.PiimApiClient;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -24,10 +25,16 @@ public class SimpleGameSearchOperationProcessor implements SimpleGameSearchOpera
     @Override
     public SimpleGameSearchResult process(final SimpleGameSearchInput input) {
 
+        GetAllGamesByIdsResult result = piimApiClient.getAllGamesByIds(new GetAllGamesByIdsInput(input.getIds(),
+                input.getPage(),
+                input.getSize()));
+
         return SimpleGameSearchResult.builder()
+                .page(result.getPage())
+                .limit(result.getLimit())
+                .totalItems(result.getTotalItems())
                 .games(
-                        piimApiClient.getAllGamesByIds(new GetAllGamesByIdsInput(input.getIds()))
-                                .getGames().stream()
+                        result.getGames().stream()
                                 .map(gameOutput -> GameBffOutput.builder()
                                         .id(gameOutput.getId())
                                         .name(gameOutput.getName())

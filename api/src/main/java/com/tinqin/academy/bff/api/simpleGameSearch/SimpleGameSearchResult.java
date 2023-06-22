@@ -12,5 +12,8 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class SimpleGameSearchResult implements OperationResult {
+    Integer page;
+    Integer limit;
+    Long totalItems;
     List<GameBffOutput> games;
 }
