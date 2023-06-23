@@ -7,7 +7,8 @@ import com.tinqin.academy.bff.api.operations.searchgamesbycategory.SearchGameByC
 import com.tinqin.academy.bff.api.operations.searchgamesbycategory.SearchGameByCategoryOperation;
 import com.tinqin.academy.bff.api.operations.searchgamesbycategory.SearchGameByCategoryResult;
 import com.tinqin.academy.bff.api.operations.simplegamesearch.entityoutputmodels.GameBffOutput;
-import com.tinqin.academy.piim.api.game.getallbycategoryname.GetAllGamesByCategoryNameInput;
+import com.tinqin.academy.bff.api.operations.simplegamesearch.entityoutputmodels.ReviewBffOutput;
+import com.tinqin.academy.piim.api.category.getbyname.GetByNameCategoryResult;
 import com.tinqin.academy.piim.api.game.getallbycategoryname.GetAllGamesByCategoryNameResult;
 import com.tinqin.academy.piim.restexport.PiimApiClient;
 import io.vavr.control.Either;
@@ -28,36 +29,37 @@ public class SearchGamesByCategoryOperationProcessor implements SearchGameByCate
     @Override
     public Either<Errorz, SearchGameByCategoryResult> process(SearchGameByCategoryInput input) {
         return Try.of(() -> {
-                    GetAllGamesByCategoryNameResult result =
-                            piimApiClient.getAllGamesByCategoryName(GetAllGamesByCategoryNameInput.builder()
-                                    .page(input.getPage())
-                                    .size(input.getSize())
-                                    .categoryName(input.getCategoryName())
-                                    .build());
+                    GetByNameCategoryResult category = piimApiClient.getCategoryByName(input.getCategoryName());
 
-                    List<GameBffOutput> games = result.getGames().stream()
+                    GetAllGamesByCategoryNameResult gameOutputs = piimApiClient.getAllGamesByCategoryName(
+                            input.getCategoryName(), input.getPage(), input.getSize());
+
+                    List<GameBffOutput> games = gameOutputs.getGames().stream()
                             .map(gameOutput -> GameBffOutput.builder()
                                     .id(gameOutput.getId())
                                     .name(gameOutput.getName())
                                     .description(gameOutput.getAvgReviewDescription())
-                                    .reviews(List.of()) // TODO finish this stuff
+                                    .reviews(piimApiClient.getReviewsByGameId(gameOutput.getId()).getReviews().stream()
+                                            .map(reviewOutput ->
+                                                    conversionService.convert(reviewOutput, ReviewBffOutput.class))
+                                            .toList())
                                     .build())
                             .toList();
 
                     return SearchGameByCategoryResult.builder()
-                            .page(result.getPage())
-                            .limit(result.getLimit())
-                            .totalItems(result.getTotalItems())
+                            .page(gameOutputs.getPage())
+                            .limit(gameOutputs.getLimit())
+                            .totalItems(gameOutputs.getTotalItems())
                             .category(CategoryBffOutput.builder()
-                                    .id(result.getCategory().getId())
-                                    .name(result.getCategory().getName())
+                                    .id(category.getId())
+                                    .name(category.getName())
                                     .build())
                             .games(games)
                             .build();
                 })
                 .toEither()
                 .mapLeft(throwable -> {
-                    return new SearchGamesByCategoryError(400, ":(");
+                    return new SearchGamesByCategoryError(400, throwable.getMessage());
                 });
     }
 }
