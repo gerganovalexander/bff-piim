@@ -1,20 +1,19 @@
 package com.tinqin.academy.bff.business.tests.operationproccessors;
 
+import com.tinqin.academy.bff.api.generics.Errorz;
 import com.tinqin.academy.bff.api.operations.searchgamesbycategory.SearchGameByCategoryInput;
+import com.tinqin.academy.bff.api.operations.searchgamesbycategory.SearchGameByCategoryResult;
 import com.tinqin.academy.bff.business.operations.searchgamesbycategory.SearchGamesByCategoryOperationProcessor;
-import com.tinqin.academy.piim.api.category.getbyname.GetByNameCategoryResult;
-import com.tinqin.academy.piim.api.entityoutputmodels.CategoryOutput;
-import com.tinqin.academy.piim.api.entityoutputmodels.ReviewOutput;
-import com.tinqin.academy.piim.api.game.getallbycategoryname.GetAllGamesByCategoryNameResult;
-import com.tinqin.academy.piim.api.review.getreviewsbygameid.GetReviewsByGameIdResult;
+import com.tinqin.academy.bff.business.tests.operationproccessors.helpers.Helpers;
 import com.tinqin.academy.piim.restexport.PiimApiClient;
-import org.junit.jupiter.api.BeforeEach;
+import feign.FeignException;
+import io.vavr.control.Either;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.convert.ConversionService;
 
@@ -22,48 +21,85 @@ import org.springframework.core.convert.ConversionService;
 public class SearchGamesByCategoryOperationProcessorTests {
     @Mock
     PiimApiClient piimApiClient;
+
     @Mock
     ConversionService conversionService;
     @InjectMocks
     SearchGamesByCategoryOperationProcessor searchGamesByCategoryOperationProcessor;
 
-    @BeforeEach
-    void setup() {
-        MockitoAnnotations.openMocks(this);
+    @Test
+    public void process_Should_ReturnSearchGameByCategoryResult_When_InputIsValid() {
+
+        SearchGameByCategoryInput input = SearchGameByCategoryInput.builder()
+                .categoryName("Mock Category")
+                .page(0)
+                .size(10)
+                .build();
+
+        Mockito.when(piimApiClient.getCategoryByName(Mockito.anyString())).thenReturn(Helpers.getByNameCategoryResult());
+
+        Mockito.when(piimApiClient.getAllGamesByCategoryName(Mockito.anyString(), Mockito.anyInt(), Mockito.anyInt()))
+                .thenReturn(Helpers.createMockGetAllGamesCategoryNameResult());
+
+        Mockito.when(piimApiClient.getReviewsByGameId(Mockito.anyLong())).thenReturn(Helpers.createMockReviewsByGameIdResult());
+
+        Either<Errorz, SearchGameByCategoryResult> mockResult = searchGamesByCategoryOperationProcessor.process(input);
+
+        Assertions.assertTrue(mockResult.isRight());
+    }
+    @Test
+    public void process_Should_ReturnSearchGameByCategoryError_When_CategoryDoesNotExist() {
+
+        SearchGameByCategoryInput input = SearchGameByCategoryInput.builder()
+                .categoryName("Mock Category")
+                .page(0)
+                .size(10)
+                .build();
+
+        Mockito.when(piimApiClient.getCategoryByName(Mockito.anyString())).thenThrow(FeignException.class);
+
+        Either<Errorz, SearchGameByCategoryResult> mockResult = searchGamesByCategoryOperationProcessor.process(input);
+
+        Assertions.assertTrue(mockResult.isLeft());
     }
 
     @Test
-    public void process_Should_ReturnSearchGameByCategoryResult_When_InputIsValid() {
+    public void process_Should_ReturnSearchGameByCategoryError_When_GetAllGamesByCategoryNameInputIsNotValid() {
+
         SearchGameByCategoryInput input = SearchGameByCategoryInput.builder()
-                .categoryName("action")
+                .categoryName("Mock Category")
                 .page(0)
-                .size(5)
+                .size(10)
                 .build();
-        GetByNameCategoryResult categoryResult = GetByNameCategoryResult.builder()
-                .id(1L)
-                .name("action")
-                .build();
-        CategoryOutput categoryOutput = CategoryOutput.builder()
-                .id(1L)
-                .name("action")
-                .build();
-//        GameBffOutput gameBffOutput = GameBffOutput.builder()
-//                .id(1L).build()
-        GetAllGamesByCategoryNameResult gameOutputs = GetAllGamesByCategoryNameResult.builder()
-                .category(categoryOutput)
+
+        Mockito.when(piimApiClient.getCategoryByName(Mockito.anyString())).thenReturn(Helpers.getByNameCategoryResult());
+
+        Mockito.when(piimApiClient.getAllGamesByCategoryName(Mockito.anyString(), Mockito.anyInt(), Mockito.anyInt()))
+                .thenThrow(FeignException.class);
+
+
+        Either<Errorz, SearchGameByCategoryResult> mockResult = searchGamesByCategoryOperationProcessor.process(input);
+
+        Assertions.assertTrue(mockResult.isLeft());
+    }
+    @Test
+    public void process_Should_ReturnSearchGameByCategoryError_When_GetReviewsByGameIdResultIsNotValid() {
+
+        SearchGameByCategoryInput input = SearchGameByCategoryInput.builder()
+                .categoryName("Mock Category")
                 .page(0)
-                .limit(5)
-                .games().build();
-        ReviewOutput reviewOutput = ReviewOutput.builder()
-                .id(1L)
-                .text("test")
-                ..build()
-        GetReviewsByGameIdResult getReviewsByGameIdResult = GetReviewsByGameIdResult.builder()
-                .reviews().build();
+                .size(10)
+                .build();
 
-        Mockito.when(piimApiClient.getCategoryByName(input.getCategoryName()))
-                .thenReturn(categoryResult);
-        Mockito.when()
+        Mockito.when(piimApiClient.getCategoryByName(Mockito.anyString())).thenReturn(Helpers.getByNameCategoryResult());
 
+        Mockito.when(piimApiClient.getAllGamesByCategoryName(Mockito.anyString(), Mockito.anyInt(), Mockito.anyInt()))
+                .thenReturn(Helpers.createMockGetAllGamesCategoryNameResult());
+
+        Mockito.when(piimApiClient.getReviewsByGameId(Mockito.anyLong())).thenThrow(FeignException.class);
+
+        Either<Errorz, SearchGameByCategoryResult> mockResult = searchGamesByCategoryOperationProcessor.process(input);
+
+        Assertions.assertTrue(mockResult.isLeft());
     }
 }
