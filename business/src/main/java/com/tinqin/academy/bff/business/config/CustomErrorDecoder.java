@@ -17,12 +17,17 @@ public class CustomErrorDecoder implements ErrorDecoder {
     private final ObjectMapper objectMapper;
     @Override
     public Exception decode(final String s, final Response response) {
-//        String message = "Generic error message";
-//        try {
-//            message = objectMapper.readValue(response.body().asInputStream(), String.class);
-//        } catch (IOException e) {
-//            throw new RuntimeException(e.getMessage());
-//        }
-        return new PiimClientException(response.body().toString(), response.status());
+        HttpStatus responseStatus = HttpStatus.valueOf(response.status());
+
+        if(responseStatus.isSameCodeAs(HttpStatus.NOT_FOUND)) {
+            return new PiimClientException("Resource not found.", response.status());
+        }
+        if(responseStatus.isSameCodeAs(HttpStatus.CONFLICT)) {
+            return new PiimClientException("Resource already exists.", response.status());
+        }
+        if(responseStatus.isSameCodeAs(HttpStatus.BAD_REQUEST)) {
+            return new PiimClientException("Invalid request.", response.status());
+        }
+        return new PiimClientException("Oops, something went wrong :(", response.status());
     }
 }
