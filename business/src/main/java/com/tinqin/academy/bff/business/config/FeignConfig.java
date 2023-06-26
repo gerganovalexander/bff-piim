@@ -8,10 +8,12 @@ import feign.jackson.JacksonEncoder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Component;
 
 @Configuration
 @RequiredArgsConstructor
 public class FeignConfig {
+    private final CustomErrorDecoder customErrorDecoder;
 
     @Bean(name = "PiimApiClient")
     public PiimApiClient getPiimApiClient() {
@@ -20,6 +22,7 @@ public class FeignConfig {
         return Feign.builder()
                 .encoder(new JacksonEncoder(objectMapper))
                 .decoder(new JacksonDecoder(objectMapper))
+                .errorDecoder(customErrorDecoder)
                 .target(PiimApiClient.class, "http://localhost:8080");
     }
 }

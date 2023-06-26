@@ -45,6 +45,6 @@ public class CreateGamePatchOperationProcessor implements CreateGamePatchBffOper
                             .build();
                 })
                 .toEither()
-                .mapLeft(throwable -> new CreateGamePatchError(400, "Invalid Game Patch"));
+                .mapLeft(throwable -> new CreateGamePatchError(400, throwable.getMessage()));
     }
 }

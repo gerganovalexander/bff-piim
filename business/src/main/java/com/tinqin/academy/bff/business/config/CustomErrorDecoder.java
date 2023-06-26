@@ -1,31 +1,28 @@
 package com.tinqin.academy.bff.business.config;
 
-import com.tinqin.academy.bff.business.exceptions.EntityDuplicateException;
-import com.tinqin.academy.bff.business.exceptions.EntityNotFoundException;
-import com.tinqin.academy.bff.business.exceptions.InvalidParametersException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.tinqin.academy.bff.business.exceptions.PiimClientException;
 import feign.Response;
 import feign.codec.ErrorDecoder;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
 
+@Component
+@RequiredArgsConstructor
 public class CustomErrorDecoder implements ErrorDecoder {
-    @Override
-    public Exception decode(String s, Response response) {
-        Response.Body responseBody = response.body();
-        HttpStatus responseStatus = HttpStatus.valueOf(response.status());
 
-        if (responseStatus.isSameCodeAs(HttpStatus.NOT_FOUND)) {
-            return new EntityNotFoundException(responseBody.toString());
-        }
-        else if (responseStatus.isSameCodeAs(HttpStatus.CONFLICT)) {
-            return new EntityDuplicateException(responseBody.toString());
-        }
-        else if (responseStatus.isSameCodeAs(HttpStatus.BAD_REQUEST)) {
-            return new InvalidParametersException(responseBody.toString());
-        }
-        else {
-            return new RuntimeException("Generic exception");
-        }
+    private final ObjectMapper objectMapper;
+    @Override
+    public Exception decode(final String s, final Response response) {
+//        String message = "Generic error message";
+//        try {
+//            message = objectMapper.readValue(response.body().asInputStream(), String.class);
+//        } catch (IOException e) {
+//            throw new RuntimeException(e.getMessage());
+//        }
+        return new PiimClientException(response.body().toString(), response.status());
     }
 }
