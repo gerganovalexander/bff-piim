@@ -10,14 +10,11 @@ import com.tinqin.academy.piim.api.category.getbyname.GetByNameCategoryResult;
 import com.tinqin.academy.piim.api.entityoutputmodels.*;
 import com.tinqin.academy.piim.api.game.getallbycategoryname.GetAllGamesByCategoryNameResult;
 import com.tinqin.academy.piim.api.game.getallbyids.GetAllGamesByIdsResult;
-import com.tinqin.academy.piim.api.gamepatch.create.CreateGamePatchInput;
 import com.tinqin.academy.piim.api.gamepatch.create.CreateGamePatchResult;
 import com.tinqin.academy.piim.api.review.getreviewsbygameid.GetReviewsByGameIdResult;
 import lombok.AllArgsConstructor;
-import org.mockito.Mockito;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -29,14 +26,16 @@ public class Helpers {
                 .id(1L)
                 .name("MockName")
                 .publisher("MockPublisher")
-                .category(Set.of(createCategoryResultMock()))
+                .category(Set.of(createMockCategoryOutput()))
                 .systemRequirements(sysReqOutMock())
                 .releaseDate(LocalDateTime.parse("2014-12-21T10:15:30"))
                 .avgReviewDescription("MockDescription")
                 .build();
     }
 
-
+    public static CategoryOutput createMockCategoryOutput() {
+        return CategoryOutput.builder().id(1L).name("mockCategory").build();
+    }
 
     public static UserOutput createMockUserOutput() {
         return UserOutput.builder().id(1L).fullName("MockFullName").build();
@@ -105,7 +104,7 @@ public class Helpers {
                 .build();
     }
 
-    public static GetReviewsByGameIdResult createMockReviewsByGameIdResult(){
+    public static GetReviewsByGameIdResult createMockReviewsByGameIdResult() {
         return GetReviewsByGameIdResult.builder()
                 .reviews(List.of(reviewOutputMock(), reviewOutputMock()))
                 .build();
@@ -128,11 +127,13 @@ public class Helpers {
                 .games(List.of(createMockGameOutput(), createMockGameOutput()))
                 .build();
     }
+
     public static GetReviewsByGameIdResult createGetReviewsByGameIdResultMock() {
         return GetReviewsByGameIdResult.builder()
                 .reviews(List.of(reviewOutputMock(), reviewOutputMock()))
                 .build();
     }
+
     public static GamePatchOutput createGetPatchOutputMock() {
         return GamePatchOutput.builder()
                 .id(1L)
@@ -142,12 +143,9 @@ public class Helpers {
                 .build();
     }
 
-
     public static CreateGamePatchResult createGamePatchResultMock() {
         return CreateGamePatchResult.builder()
                 .gamePatchOutput(createGetPatchOutputMock())
                 .build();
     }
-
-
 }
