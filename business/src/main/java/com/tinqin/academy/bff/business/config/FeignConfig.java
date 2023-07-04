@@ -26,7 +26,7 @@ public class FeignConfig {
                 .errorDecoder(customErrorDecoder)
                 .target(PiimApiClient.class, "http://localhost:8080");
     }
-    @Bean(name = "PiimApiClient")
+    @Bean(name = "DiscussionApiClient")
     public DiscussionApiClient getDiscussionApiClient() {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.findAndRegisterModules();
