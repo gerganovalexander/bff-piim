@@ -2,11 +2,14 @@ package com.tinqin.academy.bff.business.operations.simplegamesearch;
 
 import com.tinqin.academy.bff.api.erorrzzzz.SimpleGameSearchError;
 import com.tinqin.academy.bff.api.generics.Errorz;
+import com.tinqin.academy.bff.api.operations.entityoutputmodels.CommentBffOutput;
+import com.tinqin.academy.bff.api.operations.entityoutputmodels.GameBffOutput;
+import com.tinqin.academy.bff.api.operations.entityoutputmodels.ReviewBffOutput;
 import com.tinqin.academy.bff.api.operations.simplegamesearch.SimpleGameSearchInput;
 import com.tinqin.academy.bff.api.operations.simplegamesearch.SimpleGameSearchOperation;
 import com.tinqin.academy.bff.api.operations.simplegamesearch.SimpleGameSearchResult;
-import com.tinqin.academy.bff.api.operations.simplegamesearch.entityoutputmodels.GameBffOutput;
-import com.tinqin.academy.bff.api.operations.simplegamesearch.entityoutputmodels.ReviewBffOutput;
+import com.tinqin.academy.discussion.api.operations.getallbyentityid.GetAllByEntityIdInput;
+import com.tinqin.academy.discussion.restexport.DiscussionApiClient;
 import com.tinqin.academy.piim.api.entityoutputmodels.ReviewOutput;
 import com.tinqin.academy.piim.api.game.getallbyids.GetAllGamesByIdsInput;
 import com.tinqin.academy.piim.api.game.getallbyids.GetAllGamesByIdsResult;
@@ -25,6 +28,7 @@ import java.util.List;
 public class SimpleGameSearchOperationProcessor implements SimpleGameSearchOperation {
 
     private final PiimApiClient piimApiClient;
+    private final DiscussionApiClient discussionApiClient;
     private final ConversionService conversionService;
 
     @Override
@@ -62,6 +66,17 @@ public class SimpleGameSearchOperationProcessor implements SimpleGameSearchOpera
                         .reviews(getReviewBffOutputs(piimApiClient
                                 .getReviewsByGameId(gameOutput.getId())
                                 .getReviews()))
+                        .comments(discussionApiClient
+                                .getAllCommentsByEntityId(GetAllByEntityIdInput.builder()
+                                        .page(0)
+                                        .limit(10)
+                                        .entityId(gameOutput.getId())
+                                        .entityType("GAME")
+                                        .build())
+                                .getCommentOutput()
+                                .stream()
+                                .map(comment -> conversionService.convert(comment, CommentBffOutput.class))
+                                .toList())
                         .build())
                 .toList();
     }

@@ -1,4 +1,4 @@
-package com.tinqin.academy.bff.api.operations.searchgamesbycategory;
+package com.tinqin.academy.bff.api.operations.entityoutputmodels;
 
 import lombok.*;
 

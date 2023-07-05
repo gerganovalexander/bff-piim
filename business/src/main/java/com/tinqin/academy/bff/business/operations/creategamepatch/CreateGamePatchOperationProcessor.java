@@ -5,7 +5,7 @@ import com.tinqin.academy.bff.api.generics.Errorz;
 import com.tinqin.academy.bff.api.operations.creategamepatch.CreateGamePatchBffInput;
 import com.tinqin.academy.bff.api.operations.creategamepatch.CreateGamePatchBffOperation;
 import com.tinqin.academy.bff.api.operations.creategamepatch.CreateGamePatchBffResult;
-import com.tinqin.academy.bff.api.operations.creategamepatch.GamePatchBffOutput;
+import com.tinqin.academy.bff.api.operations.entityoutputmodels.GamePatchBffOutput;
 import com.tinqin.academy.piim.api.entityoutputmodels.GamePatchOutput;
 import com.tinqin.academy.piim.api.gamepatch.create.CreateGamePatchInput;
 import com.tinqin.academy.piim.api.gamepatch.create.CreateGamePatchResult;

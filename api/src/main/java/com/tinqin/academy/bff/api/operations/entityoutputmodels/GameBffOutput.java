@@ -1,4 +1,4 @@
-package com.tinqin.academy.bff.api.operations.simplegamesearch.entityoutputmodels;
+package com.tinqin.academy.bff.api.operations.entityoutputmodels;
 
 import lombok.*;
 
@@ -17,4 +17,6 @@ public class GameBffOutput {
     private List<ReviewBffOutput> reviews;
 
     private String description;
+
+    private List<CommentBffOutput> comments;
 }

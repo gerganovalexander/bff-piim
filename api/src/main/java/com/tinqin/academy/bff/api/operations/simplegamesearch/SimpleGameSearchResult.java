@@ -1,7 +1,7 @@
 package com.tinqin.academy.bff.api.operations.simplegamesearch;
 
 import com.tinqin.academy.bff.api.generics.OperationResult;
-import com.tinqin.academy.bff.api.operations.simplegamesearch.entityoutputmodels.GameBffOutput;
+import com.tinqin.academy.bff.api.operations.entityoutputmodels.GameBffOutput;
 import lombok.*;
 
 import java.util.List;

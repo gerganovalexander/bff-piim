@@ -1,4 +1,4 @@
-package com.tinqin.academy.bff.api.operations.creategamepatch;
+package com.tinqin.academy.bff.api.operations.entityoutputmodels;
 
 import lombok.*;
 

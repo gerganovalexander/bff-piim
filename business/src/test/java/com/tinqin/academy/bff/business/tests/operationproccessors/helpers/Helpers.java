@@ -1,10 +1,10 @@
 package com.tinqin.academy.bff.business.tests.operationproccessors.helpers;
 
-import com.tinqin.academy.bff.api.operations.searchgamesbycategory.CategoryBffOutput;
+import com.tinqin.academy.bff.api.operations.entityoutputmodels.CategoryBffOutput;
+import com.tinqin.academy.bff.api.operations.entityoutputmodels.GameBffOutput;
+import com.tinqin.academy.bff.api.operations.entityoutputmodels.ReviewBffOutput;
+import com.tinqin.academy.bff.api.operations.entityoutputmodels.UserBffOutput;
 import com.tinqin.academy.bff.api.operations.searchgamesbycategory.SearchGameByCategoryResult;
-import com.tinqin.academy.bff.api.operations.simplegamesearch.entityoutputmodels.GameBffOutput;
-import com.tinqin.academy.bff.api.operations.simplegamesearch.entityoutputmodels.ReviewBffOutput;
-import com.tinqin.academy.bff.api.operations.simplegamesearch.entityoutputmodels.UserBffOutput;
 import com.tinqin.academy.piim.api.category.create.CreateCategoryResult;
 import com.tinqin.academy.piim.api.category.getbyname.GetByNameCategoryResult;
 import com.tinqin.academy.piim.api.entityoutputmodels.*;
@@ -80,6 +80,7 @@ public class Helpers {
                 .name("test user")
                 .description("test")
                 .reviews(List.of(createReviewBffOutputMock(), createReviewBffOutputMock()))
+                .comments(List.of())
                 .build();
     }
 

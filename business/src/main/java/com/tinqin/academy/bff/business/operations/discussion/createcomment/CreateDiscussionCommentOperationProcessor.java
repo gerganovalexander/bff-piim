@@ -5,12 +5,12 @@ import com.tinqin.academy.bff.api.generics.Errorz;
 import com.tinqin.academy.bff.api.operations.discussion.createcomment.CreateDiscussionCommentInput;
 import com.tinqin.academy.bff.api.operations.discussion.createcomment.CreateDiscussionCommentOperation;
 import com.tinqin.academy.bff.api.operations.discussion.createcomment.CreateDiscussionCommentResult;
+import com.tinqin.academy.discussion.api.operations.createcomment.CreateCommentInput;
+import com.tinqin.academy.discussion.api.operations.createcomment.CreateCommentResult;
 import com.tinqin.academy.discussion.restexport.DiscussionApiClient;
 import io.vavr.control.Either;
 import io.vavr.control.Try;
 import lombok.RequiredArgsConstructor;
-import operations.createcomment.CreateCommentInput;
-import operations.createcomment.CreateCommentResult;
 import org.springframework.stereotype.Service;
 
 @Service
