@@ -5,6 +5,7 @@ import com.tinqin.academy.bff.api.operations.searchgamesbycategory.SearchGameByC
 import com.tinqin.academy.bff.api.operations.searchgamesbycategory.SearchGameByCategoryResult;
 import com.tinqin.academy.bff.business.operations.searchgamesbycategory.SearchGamesByCategoryOperationProcessor;
 import com.tinqin.academy.bff.business.tests.operationproccessors.helpers.Helpers;
+import com.tinqin.academy.discussion.restexport.DiscussionApiClient;
 import com.tinqin.academy.piim.restexport.PiimApiClient;
 import feign.FeignException;
 import io.vavr.control.Either;
@@ -23,7 +24,11 @@ public class SearchGamesByCategoryOperationProcessorTests {
     PiimApiClient piimApiClient;
 
     @Mock
+    DiscussionApiClient discussionApiClient;
+
+    @Mock
     ConversionService conversionService;
+
     @InjectMocks
     SearchGamesByCategoryOperationProcessor searchGamesByCategoryOperationProcessor;
 
@@ -36,17 +41,23 @@ public class SearchGamesByCategoryOperationProcessorTests {
                 .size(10)
                 .build();
 
-        Mockito.when(piimApiClient.getCategoryByName(Mockito.anyString())).thenReturn(Helpers.getByNameCategoryResult());
+        Mockito.when(piimApiClient.getCategoryByName(Mockito.anyString()))
+                .thenReturn(Helpers.getByNameCategoryResult());
 
         Mockito.when(piimApiClient.getAllGamesByCategoryName(Mockito.anyString(), Mockito.anyInt(), Mockito.anyInt()))
                 .thenReturn(Helpers.createMockGetAllGamesCategoryNameResult());
 
-        Mockito.when(piimApiClient.getReviewsByGameId(Mockito.anyLong())).thenReturn(Helpers.createMockReviewsByGameIdResult());
+        Mockito.when(piimApiClient.getReviewsByGameId(Mockito.anyLong()))
+                .thenReturn(Helpers.createMockReviewsByGameIdResult());
+
+        Mockito.when(discussionApiClient.getAllCommentsByEntityId(Mockito.any()))
+                .thenReturn(Helpers.getAllCommentsMock());
 
         Either<Errorz, SearchGameByCategoryResult> mockResult = searchGamesByCategoryOperationProcessor.process(input);
 
         Assertions.assertTrue(mockResult.isRight());
     }
+
     @Test
     public void process_Should_ReturnSearchGameByCategoryError_When_CategoryDoesNotExist() {
 
@@ -72,16 +83,17 @@ public class SearchGamesByCategoryOperationProcessorTests {
                 .size(10)
                 .build();
 
-        Mockito.when(piimApiClient.getCategoryByName(Mockito.anyString())).thenReturn(Helpers.getByNameCategoryResult());
+        Mockito.when(piimApiClient.getCategoryByName(Mockito.anyString()))
+                .thenReturn(Helpers.getByNameCategoryResult());
 
         Mockito.when(piimApiClient.getAllGamesByCategoryName(Mockito.anyString(), Mockito.anyInt(), Mockito.anyInt()))
                 .thenThrow(FeignException.class);
-
 
         Either<Errorz, SearchGameByCategoryResult> mockResult = searchGamesByCategoryOperationProcessor.process(input);
 
         Assertions.assertTrue(mockResult.isLeft());
     }
+
     @Test
     public void process_Should_ReturnSearchGameByCategoryError_When_GetReviewsByGameIdResultIsNotValid() {
 
@@ -91,7 +103,8 @@ public class SearchGamesByCategoryOperationProcessorTests {
                 .size(10)
                 .build();
 
-        Mockito.when(piimApiClient.getCategoryByName(Mockito.anyString())).thenReturn(Helpers.getByNameCategoryResult());
+        Mockito.when(piimApiClient.getCategoryByName(Mockito.anyString()))
+                .thenReturn(Helpers.getByNameCategoryResult());
 
         Mockito.when(piimApiClient.getAllGamesByCategoryName(Mockito.anyString(), Mockito.anyInt(), Mockito.anyInt()))
                 .thenReturn(Helpers.createMockGetAllGamesCategoryNameResult());

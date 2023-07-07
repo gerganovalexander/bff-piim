@@ -5,6 +5,7 @@ import com.tinqin.academy.bff.api.operations.simplegamesearch.SimpleGameSearchIn
 import com.tinqin.academy.bff.api.operations.simplegamesearch.SimpleGameSearchResult;
 import com.tinqin.academy.bff.business.operations.simplegamesearch.SimpleGameSearchOperationProcessor;
 import com.tinqin.academy.bff.business.tests.operationproccessors.helpers.Helpers;
+import com.tinqin.academy.discussion.restexport.DiscussionApiClient;
 import com.tinqin.academy.piim.api.game.getallbyids.GetAllGamesByIdsInput;
 import com.tinqin.academy.piim.restexport.PiimApiClient;
 import feign.FeignException;
@@ -27,11 +28,13 @@ public class SimpleGameSearchOperationProcessorTests {
     PiimApiClient piimApiClient;
 
     @Mock
+    DiscussionApiClient discussionApiClient;
+
+    @Mock
     ConversionService conversionService;
 
     @InjectMocks
     SimpleGameSearchOperationProcessor simpleGameSearchOperationProcessor;
-
 
     @Test
     public void process_Should_ReturnSimpleGameSearchResult_When_InputIsValid() {
@@ -45,12 +48,14 @@ public class SimpleGameSearchOperationProcessorTests {
                 .thenReturn(Helpers.createGetAllGamesByIdsResult());
         Mockito.when(piimApiClient.getReviewsByGameId(Mockito.anyLong()))
                 .thenReturn(Helpers.createGetReviewsByGameIdResultMock());
+        Mockito.when(discussionApiClient.getAllCommentsByEntityId(Mockito.any()))
+                .thenReturn(Helpers.getAllCommentsMock());
 
         Either<Errorz, SimpleGameSearchResult> result = simpleGameSearchOperationProcessor.process(input);
 
         Assertions.assertTrue(result.isRight());
-
     }
+
     @Test
     public void process_Should_ReturnSimpleGameSearchError_When_GetAllGamesByIdsInputIsNotValid() {
         SimpleGameSearchInput input = SimpleGameSearchInput.builder()
@@ -64,7 +69,6 @@ public class SimpleGameSearchOperationProcessorTests {
         Either<Errorz, SimpleGameSearchResult> result = simpleGameSearchOperationProcessor.process(input);
 
         Assertions.assertTrue(result.isLeft());
-
     }
 
     @Test
@@ -77,13 +81,10 @@ public class SimpleGameSearchOperationProcessorTests {
 
         Mockito.when(piimApiClient.getAllGamesByIds(Mockito.any(GetAllGamesByIdsInput.class)))
                 .thenReturn(Helpers.createGetAllGamesByIdsResult());
-        Mockito.when(piimApiClient.getReviewsByGameId(Mockito.anyLong()))
-                .thenThrow(FeignException.class);
+        Mockito.when(piimApiClient.getReviewsByGameId(Mockito.anyLong())).thenThrow(FeignException.class);
 
         Either<Errorz, SimpleGameSearchResult> result = simpleGameSearchOperationProcessor.process(input);
 
         Assertions.assertTrue(result.isLeft());
-
     }
-
 }

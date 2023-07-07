@@ -5,6 +5,7 @@ import com.tinqin.academy.bff.api.operations.entityoutputmodels.GameBffOutput;
 import com.tinqin.academy.bff.api.operations.entityoutputmodels.ReviewBffOutput;
 import com.tinqin.academy.bff.api.operations.entityoutputmodels.UserBffOutput;
 import com.tinqin.academy.bff.api.operations.searchgamesbycategory.SearchGameByCategoryResult;
+import com.tinqin.academy.discussion.api.operations.getallbyentityid.GetAllByEntityIdResult;
 import com.tinqin.academy.piim.api.category.create.CreateCategoryResult;
 import com.tinqin.academy.piim.api.category.getbyname.GetByNameCategoryResult;
 import com.tinqin.academy.piim.api.entityoutputmodels.*;
@@ -58,6 +59,15 @@ public class Helpers {
                 .gpu("Nvidia 3080")
                 .operatingSystem("Windows 11")
                 .ram(32)
+                .build();
+    }
+
+    public static GetAllByEntityIdResult getAllCommentsMock() {
+        return GetAllByEntityIdResult.builder()
+                .page(0)
+                .limit(10)
+                .totalItems(0L)
+                .commentOutput(List.of())
                 .build();
     }
 
