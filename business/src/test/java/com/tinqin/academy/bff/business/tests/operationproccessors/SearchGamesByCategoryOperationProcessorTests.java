@@ -42,7 +42,7 @@ public class SearchGamesByCategoryOperationProcessorTests {
                 .build();
 
         Mockito.when(piimApiClient.getCategoryByName(Mockito.anyString()))
-                .thenReturn(Helpers.getByNameCategoryResult());
+                .thenReturn(Either.right(Helpers.getByNameCategoryResult()));
 
         Mockito.when(piimApiClient.getAllGamesByCategoryName(Mockito.anyString(), Mockito.anyInt(), Mockito.anyInt()))
                 .thenReturn(Helpers.createMockGetAllGamesCategoryNameResult());
@@ -84,7 +84,7 @@ public class SearchGamesByCategoryOperationProcessorTests {
                 .build();
 
         Mockito.when(piimApiClient.getCategoryByName(Mockito.anyString()))
-                .thenReturn(Helpers.getByNameCategoryResult());
+                .thenReturn(Either.right(Helpers.getByNameCategoryResult()));
 
         Mockito.when(piimApiClient.getAllGamesByCategoryName(Mockito.anyString(), Mockito.anyInt(), Mockito.anyInt()))
                 .thenThrow(FeignException.class);
@@ -104,7 +104,7 @@ public class SearchGamesByCategoryOperationProcessorTests {
                 .build();
 
         Mockito.when(piimApiClient.getCategoryByName(Mockito.anyString()))
-                .thenReturn(Helpers.getByNameCategoryResult());
+                .thenReturn(Either.right(Helpers.getByNameCategoryResult()));
 
         Mockito.when(piimApiClient.getAllGamesByCategoryName(Mockito.anyString(), Mockito.anyInt(), Mockito.anyInt()))
                 .thenReturn(Helpers.createMockGetAllGamesCategoryNameResult());
