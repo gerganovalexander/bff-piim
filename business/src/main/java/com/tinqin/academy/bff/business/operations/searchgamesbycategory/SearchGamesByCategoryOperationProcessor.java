@@ -9,6 +9,7 @@ import com.tinqin.academy.bff.api.operations.entityoutputmodels.ReviewBffOutput;
 import com.tinqin.academy.bff.api.operations.searchgamesbycategory.SearchGameByCategoryInput;
 import com.tinqin.academy.bff.api.operations.searchgamesbycategory.SearchGameByCategoryOperation;
 import com.tinqin.academy.bff.api.operations.searchgamesbycategory.SearchGameByCategoryResult;
+import com.tinqin.academy.bff.business.exceptions.PiimClientException;
 import com.tinqin.academy.discussion.api.operations.getallbyentityid.GetAllByEntityIdInput;
 import com.tinqin.academy.discussion.restexport.DiscussionApiClient;
 import com.tinqin.academy.piim.api.category.getbyname.GetByNameCategoryResult;
@@ -33,7 +34,9 @@ public class SearchGamesByCategoryOperationProcessor implements SearchGameByCate
     @Override
     public Either<Errorz, SearchGameByCategoryResult> process(SearchGameByCategoryInput input) {
         return Try.of(() -> {
-                    GetByNameCategoryResult category = piimApiClient.getCategoryByName(input.getCategoryName());
+                    GetByNameCategoryResult category = piimApiClient
+                            .getCategoryByName(input.getCategoryName())
+                            .getOrElseThrow(() -> new PiimClientException("Category error", 400));
 
                     GetAllGamesByCategoryNameResult gameOutputs = piimApiClient.getAllGamesByCategoryName(
                             input.getCategoryName(), input.getPage(), input.getSize());
