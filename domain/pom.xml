@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.tinqin.academy.bff</groupId>
+        <artifactId>BFF-PIIM</artifactId>
+        <version>${revision}</version>
+    </parent>
+
+    <artifactId>domain</artifactId>
+
+    <repositories>
+        <repository>
+            <id>piim-repo</id>
+            <name>PIIM Repository</name>
+            <url>file://C:/Users/${user.name}/.m2/repository/com/tinqin/academy/piim</url>
+        </repository>
+
+        <repository>
+            <id>discussion-repo</id>
+            <name>Discussion Repository</name>
+            <url>file://C:/Users/${user.name}/.m2/repository/com/tinqin/academy/discussion</url>
+        </repository>
+    </repositories>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.tinqin.academy.piim</groupId>
+            <artifactId>restexport</artifactId>
+            <version>${piim.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.tinqin.academy.discussion</groupId>
+            <artifactId>restexport</artifactId>
+            <version>${discussion.version}</version>
+        </dependency>
+    </dependencies>
+
+</project>
