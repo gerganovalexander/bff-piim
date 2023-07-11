@@ -9,10 +9,10 @@ import com.tinqin.academy.bff.api.operations.entityoutputmodels.ReviewBffOutput;
 import com.tinqin.academy.bff.api.operations.searchgamesbycategory.SearchGameByCategoryInput;
 import com.tinqin.academy.bff.api.operations.searchgamesbycategory.SearchGameByCategoryOperation;
 import com.tinqin.academy.bff.api.operations.searchgamesbycategory.SearchGameByCategoryResult;
-import com.tinqin.academy.bff.business.exceptions.PiimClientException;
 import com.tinqin.academy.discussion.api.operations.getallbyentityid.GetAllByEntityIdInput;
 import com.tinqin.academy.discussion.restexport.DiscussionApiClient;
 import com.tinqin.academy.piim.api.category.getbyname.GetByNameCategoryResult;
+import com.tinqin.academy.piim.api.errors.category.GetByNameCategoryError;
 import com.tinqin.academy.piim.api.game.getallbycategoryname.GetAllGamesByCategoryNameResult;
 import com.tinqin.academy.piim.restexport.PiimApiClient;
 import io.vavr.control.Either;
@@ -33,15 +33,18 @@ public class SearchGamesByCategoryOperationProcessor implements SearchGameByCate
 
     @Override
     public Either<Errorz, SearchGameByCategoryResult> process(SearchGameByCategoryInput input) {
-        return Try.of(() -> {
-                    GetByNameCategoryResult category = piimApiClient
-                            .getCategoryByName(input.getCategoryName())
-                            .getOrElseThrow(() -> new PiimClientException("Category error", 400));
 
+        Either<GetByNameCategoryError, GetByNameCategoryResult> either =
+                piimApiClient.getCategoryByName(input.getCategoryName());
+        Errorz error = new SearchGamesByCategoryError(400, "Category error");
+        if (either.isLeft()) return Either.left(error);
+        GetByNameCategoryResult category = either.get();
+
+        return Try.of(() -> {
                     GetAllGamesByCategoryNameResult gameOutputs = piimApiClient.getAllGamesByCategoryName(
                             input.getCategoryName(), input.getPage(), input.getSize());
 
-                    List<GameBffOutput> games = gameOutputs.getGames().stream()
+                    List<GameBffOutput> games = gameOutputs.getGames().parallelStream()
                             .map(gameOutput -> GameBffOutput.builder()
                                     .id(gameOutput.getId())
                                     .name(gameOutput.getName())

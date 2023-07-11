@@ -58,7 +58,7 @@ public class SimpleGameSearchOperationProcessor implements SimpleGameSearchOpera
     }
 
     private List<GameBffOutput> getGameBffOutputs(final GetAllGamesByIdsResult result) {
-        return result.getGames().stream()
+        return result.getGames().parallelStream()
                 .map(gameOutput -> GameBffOutput.builder()
                         .id(gameOutput.getId())
                         .name(gameOutput.getName())
