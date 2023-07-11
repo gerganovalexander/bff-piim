@@ -5,9 +5,9 @@ import com.tinqin.academy.bff.api.operations.creategamepatch.CreateGamePatchBffI
 import com.tinqin.academy.bff.api.operations.creategamepatch.CreateGamePatchBffResult;
 import com.tinqin.academy.bff.business.operations.creategamepatch.CreateGamePatchOperationProcessor;
 import com.tinqin.academy.bff.business.tests.operationproccessors.helpers.Helpers;
+import com.tinqin.academy.bff.domain.ClientInterpreter;
+import com.tinqin.academy.piim.api.errors.gamepatch.CreateGamePatchError;
 import com.tinqin.academy.piim.api.gamepatch.create.CreateGamePatchInput;
-import com.tinqin.academy.piim.restexport.PiimApiClient;
-import feign.FeignException;
 import io.vavr.control.Either;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -22,7 +22,7 @@ import org.springframework.core.convert.ConversionService;
 public class CreateGamePatchOperationProcessorTests {
 
     @Mock
-    PiimApiClient piimApiClient;
+    ClientInterpreter clientInterpreter;
 
     @Mock
     ConversionService conversionService;
@@ -38,13 +38,14 @@ public class CreateGamePatchOperationProcessorTests {
                 .version("1.0")
                 .build();
 
-        Mockito.when(piimApiClient.createGamePatch(Mockito.any(CreateGamePatchInput.class)))
-                .thenReturn(Helpers.createGamePatchResultMock());
+        Mockito.when(clientInterpreter.createGamePatch(Mockito.any(CreateGamePatchInput.class)))
+                .thenReturn(Either.right(Helpers.createGamePatchResultMock()));
 
         Either<Errorz, CreateGamePatchBffResult> result = createGamePatchOperationProcessor.process(input);
 
         Assertions.assertTrue(result.isRight());
     }
+
     @Test
     public void process_Should_ReturnCreateGamePatchBffError_When_CreateGamePatchInputIsNotValid() {
         CreateGamePatchBffInput input = CreateGamePatchBffInput.builder()
@@ -53,12 +54,11 @@ public class CreateGamePatchOperationProcessorTests {
                 .version("1.0")
                 .build();
 
-        Mockito.when(piimApiClient.createGamePatch(Mockito.any(CreateGamePatchInput.class)))
-                .thenThrow(FeignException.class);
+        Mockito.when(clientInterpreter.createGamePatch(Mockito.any(CreateGamePatchInput.class)))
+                .thenReturn(Either.left(new CreateGamePatchError(400, "error")));
 
         Either<Errorz, CreateGamePatchBffResult> result = createGamePatchOperationProcessor.process(input);
 
         Assertions.assertTrue(result.isLeft());
     }
-
 }
