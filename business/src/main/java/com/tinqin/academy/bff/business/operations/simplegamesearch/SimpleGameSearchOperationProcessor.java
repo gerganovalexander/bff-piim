@@ -8,13 +8,12 @@ import com.tinqin.academy.bff.api.operations.entityoutputmodels.ReviewBffOutput;
 import com.tinqin.academy.bff.api.operations.simplegamesearch.SimpleGameSearchInput;
 import com.tinqin.academy.bff.api.operations.simplegamesearch.SimpleGameSearchOperation;
 import com.tinqin.academy.bff.api.operations.simplegamesearch.SimpleGameSearchResult;
+import com.tinqin.academy.bff.domain.ClientInterpreter;
 import com.tinqin.academy.discussion.api.operations.getallbyentityid.GetAllByEntityIdInput;
-import com.tinqin.academy.discussion.restexport.DiscussionApiClient;
-import com.tinqin.academy.piim.api.entityoutputmodels.ReviewOutput;
+import com.tinqin.academy.piim.api.errors.game.GetAllGamesByIdsError;
 import com.tinqin.academy.piim.api.game.getallbyids.GetAllGamesByIdsInput;
 import com.tinqin.academy.piim.api.game.getallbyids.GetAllGamesByIdsResult;
-import com.tinqin.academy.piim.restexport.PiimApiClient;
-import feign.RetryableException;
+import com.tinqin.academy.piim.api.review.getreviewsbygameid.GetReviewsByGameIdInput;
 import io.vavr.control.Either;
 import io.vavr.control.Try;
 import lombok.RequiredArgsConstructor;
@@ -22,68 +21,70 @@ import org.springframework.core.convert.ConversionService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.function.Function;
 
 @RequiredArgsConstructor
 @Service
 public class SimpleGameSearchOperationProcessor implements SimpleGameSearchOperation {
 
-    private final PiimApiClient piimApiClient;
-    private final DiscussionApiClient discussionApiClient;
+    private final ClientInterpreter clientInterpreter;
     private final ConversionService conversionService;
 
     @Override
     public Either<Errorz, SimpleGameSearchResult> process(final SimpleGameSearchInput input) {
 
-        return Try.of(() -> {
-                    GetAllGamesByIdsResult result = piimApiClient.getAllGamesByIds(GetAllGamesByIdsInput.builder()
-                            .page(input.getPage())
-                            .size(input.getSize())
-                            .ids(input.getIds())
-                            .build());
+        Function<SimpleGameSearchInput, Either<GetAllGamesByIdsError, GetAllGamesByIdsResult>> f1 =
+                in -> clientInterpreter.getAllGamesByIds(GetAllGamesByIdsInput.builder()
+                        .page(in.getPage())
+                        .size(in.getSize())
+                        .ids(in.getIds())
+                        .build());
 
-                    return SimpleGameSearchResult.builder()
-                            .page(result.getPage())
-                            .limit(result.getLimit())
-                            .totalItems(result.getTotalItems())
-                            .games(getGameBffOutputs(result))
-                            .build();
-                })
+        Function<Either<GetAllGamesByIdsError, GetAllGamesByIdsResult>, Either<Errorz, SimpleGameSearchResult>> f2 =
+                e -> e.mapLeft(l -> (Errorz) new SimpleGameSearchError(400, "Could not get games"))
+                        .flatMap(r -> getGameBffOutputs(e.get())
+                                .mapLeft(l1 -> (Errorz) new SimpleGameSearchError(400, "Could not get game resource"))
+                                .map(r1 -> SimpleGameSearchResult.builder()
+                                        .page(r.getPage())
+                                        .limit(r.getLimit())
+                                        .totalItems(r.getTotalItems())
+                                        .games(r1)
+                                        .build()));
+
+        return f1.andThen(f2).apply(input);
+    }
+
+    private Either<Errorz, List<GameBffOutput>> getGameBffOutputs(final GetAllGamesByIdsResult result) {
+        return Try.of(() -> result.getGames().parallelStream()
+                        .map(gameOutput -> GameBffOutput.builder()
+                                .id(gameOutput.getId())
+                                .name(gameOutput.getName())
+                                .description(gameOutput.getAvgReviewDescription())
+                                .reviews(clientInterpreter
+                                        .getReviewsByGameId(GetReviewsByGameIdInput.builder()
+                                                .id(gameOutput.getId())
+                                                .build())
+                                        .get()
+                                        .getReviews()
+                                        .stream()
+                                        .map(reviewOutput ->
+                                                conversionService.convert(reviewOutput, ReviewBffOutput.class))
+                                        .toList())
+                                .comments(clientInterpreter
+                                        .getAllCommentsByEntity(GetAllByEntityIdInput.builder()
+                                                .page(0)
+                                                .limit(10)
+                                                .entityId(gameOutput.getId())
+                                                .entityType("GAME")
+                                                .build())
+                                        .get()
+                                        .getCommentOutput()
+                                        .stream()
+                                        .map(comment -> conversionService.convert(comment, CommentBffOutput.class))
+                                        .toList())
+                                .build())
+                        .toList())
                 .toEither()
-                .mapLeft(throwable -> {
-                    if (throwable instanceof RetryableException) {
-                        return new SimpleGameSearchError(400, "Failed to connect to external source.");
-                    }
-                    return new SimpleGameSearchError(400, "Unexpected error.");
-                });
-    }
-
-    private List<GameBffOutput> getGameBffOutputs(final GetAllGamesByIdsResult result) {
-        return result.getGames().parallelStream()
-                .map(gameOutput -> GameBffOutput.builder()
-                        .id(gameOutput.getId())
-                        .name(gameOutput.getName())
-                        .description(gameOutput.getAvgReviewDescription())
-                        .reviews(getReviewBffOutputs(piimApiClient
-                                .getReviewsByGameId(gameOutput.getId())
-                                .getReviews()))
-                        .comments(discussionApiClient
-                                .getAllCommentsByEntityId(GetAllByEntityIdInput.builder()
-                                        .page(0)
-                                        .limit(10)
-                                        .entityId(gameOutput.getId())
-                                        .entityType("GAME")
-                                        .build())
-                                .getCommentOutput()
-                                .stream()
-                                .map(comment -> conversionService.convert(comment, CommentBffOutput.class))
-                                .toList())
-                        .build())
-                .toList();
-    }
-
-    private List<ReviewBffOutput> getReviewBffOutputs(final List<ReviewOutput> reviews) {
-        return reviews.stream()
-                .map(reviewOutput -> conversionService.convert(reviewOutput, ReviewBffOutput.class))
-                .toList();
+                .mapLeft(throwable -> new SimpleGameSearchError(400, "Could not get game resource"));
     }
 }

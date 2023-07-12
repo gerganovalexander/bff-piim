@@ -5,42 +5,43 @@ import com.tinqin.academy.bff.api.generics.Errorz;
 import com.tinqin.academy.bff.api.operations.discussion.createcomment.CreateDiscussionCommentInput;
 import com.tinqin.academy.bff.api.operations.discussion.createcomment.CreateDiscussionCommentOperation;
 import com.tinqin.academy.bff.api.operations.discussion.createcomment.CreateDiscussionCommentResult;
+import com.tinqin.academy.bff.domain.ClientInterpreter;
+import com.tinqin.academy.discussion.api.errors.CreateCommentError;
 import com.tinqin.academy.discussion.api.operations.createcomment.CreateCommentInput;
 import com.tinqin.academy.discussion.api.operations.createcomment.CreateCommentResult;
-import com.tinqin.academy.discussion.restexport.DiscussionApiClient;
 import io.vavr.control.Either;
-import io.vavr.control.Try;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.function.Function;
 
 @Service
 @RequiredArgsConstructor
 public class CreateDiscussionCommentOperationProcessor implements CreateDiscussionCommentOperation {
-    private final DiscussionApiClient discussionApiClient;
+    private final ClientInterpreter clientInterpreter;
 
     @Override
     public Either<Errorz, CreateDiscussionCommentResult> process(CreateDiscussionCommentInput input) {
-        return Try.of(() -> {
-                    CreateCommentInput commentInput = CreateCommentInput.builder()
-                            .comment(input.getComment())
-                            .userId(input.getUserId())
-                            .entityType(input.getEntityType())
-                            .entityId(input.getEntityId())
-                            .build();
 
-                    CreateCommentResult commentResult = discussionApiClient.createComment(commentInput);
+        CreateCommentInput commentInput = CreateCommentInput.builder()
+                .comment(input.getComment())
+                .userId(input.getUserId())
+                .entityType(input.getEntityType())
+                .entityId(input.getEntityId())
+                .build();
 
-                    return CreateDiscussionCommentResult.builder()
-                            .id(commentResult.getId())
-                            .comment(commentResult.getComment())
-                            .userId(commentResult.getUserId())
-                            .entityType(commentInput.getEntityType())
-                            .entityId(commentInput.getEntityId())
-                            .build();
-                })
-                .toEither()
-                .mapLeft(throwable -> {
-                    return new CreateDiscussionCommentError(400, throwable.getMessage());
-                });
+        Either<CreateCommentError, CreateCommentResult> commentResult = clientInterpreter.createComment(commentInput);
+
+        Function<Either<CreateCommentError, CreateCommentResult>, Either<Errorz, CreateDiscussionCommentResult>> f =
+                e -> e.mapLeft(l -> (Errorz) new CreateDiscussionCommentError(400, "Could not create comment"))
+                        .map(r -> CreateDiscussionCommentResult.builder()
+                                .id(r.getId())
+                                .comment(r.getComment())
+                                .userId(r.getUserId())
+                                .entityType(r.getEntityType())
+                                .entityId(r.getEntityId())
+                                .build());
+
+        return f.apply(commentResult);
     }
 }

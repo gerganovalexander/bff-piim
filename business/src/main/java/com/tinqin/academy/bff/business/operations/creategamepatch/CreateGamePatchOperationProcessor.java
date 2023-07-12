@@ -45,23 +45,20 @@ public class CreateGamePatchOperationProcessor implements CreateGamePatchBffOper
         //        Predicate<Integer> predicate = (x) -> x==5;
 
         Function<Either<CreateGamePatchError, CreateGamePatchResult>, Either<Errorz, CreateGamePatchBffResult>> f =
-                (e) -> {
-                    if (e.isLeft()) {
-                        return Either.left(new CreateGamePatchErrorBff(400, "Failed to create game patch"));
-                    } else {
-                        CreateGamePatchResult result = e.get();
-                        GamePatchOutput output = result.getGamePatchOutput();
-                        return Either.right(CreateGamePatchBffResult.builder()
-                                .gamePatchBffOutput(GamePatchBffOutput.builder()
-                                        .id(output.getId())
-                                        .uploadedAt(output.getUploadedAt())
-                                        .description(output.getDescription())
-                                        .version(output.getVersion())
-                                        .gameName(output.getGame().getName())
-                                        .build())
-                                .build());
-                    }
-                };
+                (e) -> e.mapLeft(l -> (Errorz) new CreateGamePatchErrorBff(400, "Failed to create game patch"))
+                        .map(r -> {
+                            CreateGamePatchResult result = e.get();
+                            GamePatchOutput output = result.getGamePatchOutput();
+                            return CreateGamePatchBffResult.builder()
+                                    .gamePatchBffOutput(GamePatchBffOutput.builder()
+                                            .id(output.getId())
+                                            .uploadedAt(output.getUploadedAt())
+                                            .description(output.getDescription())
+                                            .version(output.getVersion())
+                                            .gameName(output.getGame().getName())
+                                            .build())
+                                    .build();
+                        });
 
         return f.apply(either);
     }
