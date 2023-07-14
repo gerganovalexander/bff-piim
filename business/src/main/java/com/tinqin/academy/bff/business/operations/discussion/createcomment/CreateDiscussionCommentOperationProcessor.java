@@ -42,17 +42,18 @@ public class CreateDiscussionCommentOperationProcessor implements CreateDiscussi
                                     this.getClass().getName()));
                             return (Errorz) new CreateDiscussionCommentError(400, "Could not create comment");
                         })
-                        .map(r -> CreateDiscussionCommentResult.builder()
-                                .id(r.getId())
-                                .comment(r.getComment())
-                                .userId(r.getUserId())
-                                .entityType(r.getEntityType())
-                                .entityId(r.getEntityId())
-                                .build());
+                        .map(r -> {
+                            log.info(String.format(
+                                    "Processor %s completed successfully.", this.getClass().getName()));
+                          return  CreateDiscussionCommentResult.builder()
+                                    .id(r.getId())
+                                    .comment(r.getComment())
+                                    .userId(r.getUserId())
+                                    .entityType(r.getEntityType())
+                                    .entityId(r.getEntityId())
+                                    .build();
+                        });
 
-        Either<Errorz, CreateDiscussionCommentResult> result = f.apply(commentResult);
-        log.info(String.format(
-                "Processor %s completed successfully.", this.getClass().getName()));
-        return result;
+        return f.apply(commentResult);
     }
 }

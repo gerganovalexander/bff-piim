@@ -53,16 +53,17 @@ public class SimpleGameSearchOperationProcessor implements SimpleGameSearchOpera
                                             this.getClass().getName()));
                                     return (Errorz) new SimpleGameSearchError(400, "Could not get game resource");
                                 })
-                                .map(r1 -> SimpleGameSearchResult.builder()
-                                        .page(r.getPage())
-                                        .limit(r.getLimit())
-                                        .totalItems(r.getTotalItems())
-                                        .games(r1)
-                                        .build()));
-        Either<Errorz, SimpleGameSearchResult> result = f1.andThen(f2).apply(input);
-        log.info(String.format(
-                "Processor %s completed successfully.", this.getClass().getName()));
-        return result;
+                                .map(r1 -> {
+                                    log.info(String.format(
+                                            "Processor %s completed successfully.", this.getClass().getName()));
+                                  return SimpleGameSearchResult.builder()
+                                            .page(r.getPage())
+                                            .limit(r.getLimit())
+                                            .totalItems(r.getTotalItems())
+                                            .games(r1)
+                                            .build();
+                                }));
+        return f1.andThen(f2).apply(input);
     }
 
     private Either<Errorz, List<GameBffOutput>> getGameBffOutputs(final GetAllGamesByIdsResult result) {

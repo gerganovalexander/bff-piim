@@ -58,6 +58,8 @@ public class CreateGamePatchOperationProcessor implements CreateGamePatchBffOper
                         .map(r -> {
                             CreateGamePatchResult result = e.get();
                             GamePatchOutput output = result.getGamePatchOutput();
+                            log.info(String.format(
+                                    "Processor %s completed successfully.", this.getClass().getName()));
                             return CreateGamePatchBffResult.builder()
                                     .gamePatchBffOutput(GamePatchBffOutput.builder()
                                             .id(output.getId())
@@ -69,9 +71,6 @@ public class CreateGamePatchOperationProcessor implements CreateGamePatchBffOper
                                     .build();
                         });
 
-        Either<Errorz, CreateGamePatchBffResult> result = f.apply(either);
-        log.info(String.format(
-                "Processor %s completed successfully.", this.getClass().getName()));
-        return result;
+        return f.apply(either);
     }
 }
