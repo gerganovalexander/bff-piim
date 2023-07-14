@@ -17,6 +17,7 @@ import com.tinqin.academy.piim.restexport.PiimApiClient;
 import io.vavr.control.Either;
 import io.vavr.control.Try;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +25,7 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @Service
+@Slf4j
 public class SearchGamesByCategoryOperationProcessor implements SearchGameByCategoryOperation {
 
     private final PiimApiClient piimApiClient;
@@ -32,6 +34,7 @@ public class SearchGamesByCategoryOperationProcessor implements SearchGameByCate
 
     @Override
     public Either<Errorz, SearchGameByCategoryResult> process(SearchGameByCategoryInput input) {
+        log.info(String.format("Processor %s started.", this.getClass().getName()));
         return Try.of(() -> {
                     GetByNameCategoryResult category = piimApiClient.getCategoryByName(input.getCategoryName());
 
@@ -60,8 +63,7 @@ public class SearchGamesByCategoryOperationProcessor implements SearchGameByCate
                                             .toList())
                                     .build())
                             .toList();
-
-                    return SearchGameByCategoryResult.builder()
+                    SearchGameByCategoryResult result = SearchGameByCategoryResult.builder()
                             .page(gameOutputs.getPage())
                             .limit(gameOutputs.getLimit())
                             .totalItems(gameOutputs.getTotalItems())
@@ -71,9 +73,12 @@ public class SearchGamesByCategoryOperationProcessor implements SearchGameByCate
                                     .build())
                             .games(games)
                             .build();
+                    log.info(String.format("Processor %s completed successfully.", this.getClass().getName()));
+                    return result;
                 })
                 .toEither()
                 .mapLeft(throwable -> {
+                    log.error(String.format("Processor %s stopped unexpectedly.", this.getClass().getName()));
                     return new SearchGamesByCategoryError(400, throwable.getMessage());
                 });
     }

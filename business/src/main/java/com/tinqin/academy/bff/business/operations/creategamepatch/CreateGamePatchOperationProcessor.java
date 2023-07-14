@@ -13,18 +13,22 @@ import com.tinqin.academy.piim.api.gamepatch.create.CreateGamePatchInput;
 import com.tinqin.academy.piim.api.gamepatch.create.CreateGamePatchResult;
 import io.vavr.control.Either;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.function.Function;
 
 @RequiredArgsConstructor
 @Service
+@Slf4j
 public class CreateGamePatchOperationProcessor implements CreateGamePatchBffOperation {
 
     private final ClientInterpreter clientInterpreter;
 
     @Override
     public Either<Errorz, CreateGamePatchBffResult> process(CreateGamePatchBffInput input) {
+        log.info(String.format("Processor %s started.", this.getClass().getName()));
+
 
         CreateGamePatchInput gamePatchInput = CreateGamePatchInput.builder()
                 .gameId(input.getGameId())
@@ -45,7 +49,12 @@ public class CreateGamePatchOperationProcessor implements CreateGamePatchBffOper
         //        Predicate<Integer> predicate = (x) -> x==5;
 
         Function<Either<CreateGamePatchError, CreateGamePatchResult>, Either<Errorz, CreateGamePatchBffResult>> f =
-                (e) -> e.mapLeft(l -> (Errorz) new CreateGamePatchErrorBff(400, "Failed to create game patch"))
+                (e) -> e.mapLeft(l -> {
+                            log.error(String.format(
+                                    "Processor %s stopped unexpectedly.",
+                                    this.getClass().getName()));
+                  return (Errorz) new CreateGamePatchErrorBff(400, "Failed to create game patch");
+                        })
                         .map(r -> {
                             CreateGamePatchResult result = e.get();
                             GamePatchOutput output = result.getGamePatchOutput();
@@ -60,6 +69,9 @@ public class CreateGamePatchOperationProcessor implements CreateGamePatchBffOper
                                     .build();
                         });
 
-        return f.apply(either);
+        Either<Errorz, CreateGamePatchBffResult> result = f.apply(either);
+        log.info(String.format(
+                "Processor %s completed successfully.", this.getClass().getName()));
+        return result;
     }
 }

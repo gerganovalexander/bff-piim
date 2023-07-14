@@ -17,6 +17,8 @@ import com.tinqin.academy.piim.api.review.getreviewsbygameid.GetReviewsByGameIdI
 import io.vavr.control.Either;
 import io.vavr.control.Try;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import lombok.extern.slf4j.XSlf4j;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.stereotype.Service;
 
@@ -25,6 +27,7 @@ import java.util.function.Function;
 
 @RequiredArgsConstructor
 @Service
+@Slf4j
 public class SimpleGameSearchOperationProcessor implements SimpleGameSearchOperation {
 
     private final ClientInterpreter clientInterpreter;
@@ -33,6 +36,7 @@ public class SimpleGameSearchOperationProcessor implements SimpleGameSearchOpera
     @Override
     public Either<Errorz, SimpleGameSearchResult> process(final SimpleGameSearchInput input) {
 
+        log.info(String.format("Processor %s started.", this.getClass().getName()));
         Function<SimpleGameSearchInput, Either<GetAllGamesByIdsError, GetAllGamesByIdsResult>> f1 =
                 in -> clientInterpreter.getAllGamesByIds(GetAllGamesByIdsInput.builder()
                         .page(in.getPage())
@@ -43,15 +47,22 @@ public class SimpleGameSearchOperationProcessor implements SimpleGameSearchOpera
         Function<Either<GetAllGamesByIdsError, GetAllGamesByIdsResult>, Either<Errorz, SimpleGameSearchResult>> f2 =
                 e -> e.mapLeft(l -> (Errorz) new SimpleGameSearchError(400, "Could not get games"))
                         .flatMap(r -> getGameBffOutputs(e.get())
-                                .mapLeft(l1 -> (Errorz) new SimpleGameSearchError(400, "Could not get game resource"))
+                                .mapLeft(l1 -> {
+                                    log.error(String.format(
+                                            "Processor %s stopped unexpectedly.",
+                                            this.getClass().getName()));
+                                    return (Errorz) new SimpleGameSearchError(400, "Could not get game resource");
+                                })
                                 .map(r1 -> SimpleGameSearchResult.builder()
                                         .page(r.getPage())
                                         .limit(r.getLimit())
                                         .totalItems(r.getTotalItems())
                                         .games(r1)
                                         .build()));
-
-        return f1.andThen(f2).apply(input);
+        Either<Errorz, SimpleGameSearchResult> result = f1.andThen(f2).apply(input);
+        log.info(String.format(
+                "Processor %s completed successfully.", this.getClass().getName()));
+        return result;
     }
 
     private Either<Errorz, List<GameBffOutput>> getGameBffOutputs(final GetAllGamesByIdsResult result) {
