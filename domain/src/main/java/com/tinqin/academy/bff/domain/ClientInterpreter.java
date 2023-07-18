@@ -13,6 +13,7 @@ import com.tinqin.academy.piim.api.errors.game.GetAllGamesByCategoryNameError;
 import com.tinqin.academy.piim.api.errors.game.GetAllGamesByIdsError;
 import com.tinqin.academy.piim.api.errors.gamepatch.CreateGamePatchError;
 import com.tinqin.academy.piim.api.errors.review.GetReviewsByGameIdError;
+import com.tinqin.academy.piim.api.errors.user.GetUserByEmailError;
 import com.tinqin.academy.piim.api.game.getallbycategoryname.GetAllGamesByCategoryNameInput;
 import com.tinqin.academy.piim.api.game.getallbycategoryname.GetAllGamesByCategoryNameResult;
 import com.tinqin.academy.piim.api.game.getallbyids.GetAllGamesByIdsInput;
@@ -21,6 +22,8 @@ import com.tinqin.academy.piim.api.gamepatch.create.CreateGamePatchInput;
 import com.tinqin.academy.piim.api.gamepatch.create.CreateGamePatchResult;
 import com.tinqin.academy.piim.api.review.getreviewsbygameid.GetReviewsByGameIdInput;
 import com.tinqin.academy.piim.api.review.getreviewsbygameid.GetReviewsByGameIdResult;
+import com.tinqin.academy.piim.api.user.getbyusername.GetUserByEmailInput;
+import com.tinqin.academy.piim.api.user.getbyusername.GetUserByEmailResult;
 import io.vavr.control.Either;
 
 public interface ClientInterpreter {
@@ -32,6 +35,8 @@ public interface ClientInterpreter {
 
     Either<GetAllGamesByCategoryNameError, GetAllGamesByCategoryNameResult> getAllGamesByCategoryName(
             GetAllGamesByCategoryNameInput input);
+
+    Either<GetUserByEmailError, GetUserByEmailResult> getUserByEmail(GetUserByEmailInput input);
 
     Either<GetReviewsByGameIdError, GetReviewsByGameIdResult> getReviewsByGameId(GetReviewsByGameIdInput input);
 

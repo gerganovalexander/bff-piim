@@ -14,6 +14,7 @@ import com.tinqin.academy.piim.api.errors.game.GetAllGamesByCategoryNameError;
 import com.tinqin.academy.piim.api.errors.game.GetAllGamesByIdsError;
 import com.tinqin.academy.piim.api.errors.gamepatch.CreateGamePatchError;
 import com.tinqin.academy.piim.api.errors.review.GetReviewsByGameIdError;
+import com.tinqin.academy.piim.api.errors.user.GetUserByEmailError;
 import com.tinqin.academy.piim.api.game.getallbycategoryname.GetAllGamesByCategoryNameInput;
 import com.tinqin.academy.piim.api.game.getallbycategoryname.GetAllGamesByCategoryNameResult;
 import com.tinqin.academy.piim.api.game.getallbyids.GetAllGamesByIdsInput;
@@ -22,6 +23,8 @@ import com.tinqin.academy.piim.api.gamepatch.create.CreateGamePatchInput;
 import com.tinqin.academy.piim.api.gamepatch.create.CreateGamePatchResult;
 import com.tinqin.academy.piim.api.review.getreviewsbygameid.GetReviewsByGameIdInput;
 import com.tinqin.academy.piim.api.review.getreviewsbygameid.GetReviewsByGameIdResult;
+import com.tinqin.academy.piim.api.user.getbyusername.GetUserByEmailInput;
+import com.tinqin.academy.piim.api.user.getbyusername.GetUserByEmailResult;
 import com.tinqin.academy.piim.restexport.PiimApiClient;
 import io.vavr.control.Either;
 import io.vavr.control.Try;
@@ -63,6 +66,13 @@ public class ClientInterpreterImpl implements ClientInterpreter {
                         input.getCategoryName(), input.getPage(), input.getSize()))
                 .toEither()
                 .mapLeft(throwable -> new GetAllGamesByCategoryNameError(400, throwable.getMessage()));
+    }
+
+    @Override
+    public Either<GetUserByEmailError, GetUserByEmailResult> getUserByEmail(GetUserByEmailInput input) {
+        return Try.of(() -> piimApiClient.getUserByEmail(input.getEmail()))
+                .toEither()
+                .mapLeft(throwable -> new GetUserByEmailError(400, throwable.getMessage()));
     }
 
     @Override
