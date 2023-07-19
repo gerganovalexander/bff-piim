@@ -1,6 +1,6 @@
 package com.tinqin.academy.bff.business.operations.creategamepatch;
 
-import com.tinqin.academy.bff.api.erorrzzzz.CreateGamePatchErrorBff;
+import com.tinqin.academy.bff.api.errors.CreateGamePatchErrorBff;
 import com.tinqin.academy.bff.api.generics.Errorz;
 import com.tinqin.academy.bff.api.operations.creategamepatch.CreateGamePatchBffInput;
 import com.tinqin.academy.bff.api.operations.creategamepatch.CreateGamePatchBffOperation;
@@ -29,7 +29,6 @@ public class CreateGamePatchOperationProcessor implements CreateGamePatchBffOper
     public Either<Errorz, CreateGamePatchBffResult> process(CreateGamePatchBffInput input) {
         log.info(String.format("Processor %s started.", this.getClass().getName()));
 
-
         CreateGamePatchInput gamePatchInput = CreateGamePatchInput.builder()
                 .gameId(input.getGameId())
                 .description(input.getDescription())
@@ -53,13 +52,14 @@ public class CreateGamePatchOperationProcessor implements CreateGamePatchBffOper
                             log.error(String.format(
                                     "Processor %s stopped unexpectedly.",
                                     this.getClass().getName()));
-                  return (Errorz) new CreateGamePatchErrorBff(400, "Failed to create game patch");
+                            return (Errorz) new CreateGamePatchErrorBff(400, "Failed to create game patch");
                         })
                         .map(r -> {
                             CreateGamePatchResult result = e.get();
                             GamePatchOutput output = result.getGamePatchOutput();
                             log.info(String.format(
-                                    "Processor %s completed successfully.", this.getClass().getName()));
+                                    "Processor %s completed successfully.",
+                                    this.getClass().getName()));
                             return CreateGamePatchBffResult.builder()
                                     .gamePatchBffOutput(GamePatchBffOutput.builder()
                                             .id(output.getId())

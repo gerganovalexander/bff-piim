@@ -24,6 +24,9 @@ public class CustomUserDetailsService implements UserDetailsService {
                 GetUserByEmailInput.builder().email(email).build());
         GetUserByEmailResult result =
                 userFromClient.getOrElseThrow(() -> new UsernameNotFoundException("oprei sa brat"));
-        return User.builder().username(email).password(null).build();
+        return User.builder()
+                .username(result.getEmail())
+                .password(result.getPassword())
+                .build();
     }
 }

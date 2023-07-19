@@ -1,6 +1,6 @@
 package com.tinqin.academy.bff.business.operations.searchgamesbycategory;
 
-import com.tinqin.academy.bff.api.erorrzzzz.SearchGamesByCategoryError;
+import com.tinqin.academy.bff.api.errors.SearchGamesByCategoryError;
 import com.tinqin.academy.bff.api.generics.Errorz;
 import com.tinqin.academy.bff.api.operations.entityoutputmodels.CategoryBffOutput;
 import com.tinqin.academy.bff.api.operations.entityoutputmodels.CommentBffOutput;
@@ -73,12 +73,16 @@ public class SearchGamesByCategoryOperationProcessor implements SearchGameByCate
                                     .build())
                             .games(games)
                             .build();
-                    log.info(String.format("Processor %s completed successfully.", this.getClass().getName()));
+                    log.info(String.format(
+                            "Processor %s completed successfully.",
+                            this.getClass().getName()));
                     return result;
                 })
                 .toEither()
                 .mapLeft(throwable -> {
-                    log.error(String.format("Processor %s stopped unexpectedly.", this.getClass().getName()));
+                    log.error(String.format(
+                            "Processor %s stopped unexpectedly.",
+                            this.getClass().getName()));
                     return new SearchGamesByCategoryError(400, throwable.getMessage());
                 });
     }

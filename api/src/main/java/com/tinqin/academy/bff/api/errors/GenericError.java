@@ -1,4 +1,4 @@
-package com.tinqin.academy.bff.api.erorrzzzz;
+package com.tinqin.academy.bff.api.errors;
 
 import com.tinqin.academy.bff.api.generics.Errorz;
 import lombok.AllArgsConstructor;

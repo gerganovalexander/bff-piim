@@ -1,6 +1,6 @@
 package com.tinqin.academy.bff.business.operations.simplegamesearch;
 
-import com.tinqin.academy.bff.api.erorrzzzz.SimpleGameSearchError;
+import com.tinqin.academy.bff.api.errors.SimpleGameSearchError;
 import com.tinqin.academy.bff.api.generics.Errorz;
 import com.tinqin.academy.bff.api.operations.entityoutputmodels.CommentBffOutput;
 import com.tinqin.academy.bff.api.operations.entityoutputmodels.GameBffOutput;
@@ -18,7 +18,6 @@ import io.vavr.control.Either;
 import io.vavr.control.Try;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import lombok.extern.slf4j.XSlf4j;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.stereotype.Service;
 
@@ -55,8 +54,9 @@ public class SimpleGameSearchOperationProcessor implements SimpleGameSearchOpera
                                 })
                                 .map(r1 -> {
                                     log.info(String.format(
-                                            "Processor %s completed successfully.", this.getClass().getName()));
-                                  return SimpleGameSearchResult.builder()
+                                            "Processor %s completed successfully.",
+                                            this.getClass().getName()));
+                                    return SimpleGameSearchResult.builder()
                                             .page(r.getPage())
                                             .limit(r.getLimit())
                                             .totalItems(r.getTotalItems())

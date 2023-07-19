@@ -1,4 +1,4 @@
-package com.tinqin.academy.bff.api.erorrzzzz;
+package com.tinqin.academy.bff.api.errors;
 
 public class CreateGamePatchErrorBff extends GenericError {
     public CreateGamePatchErrorBff(Integer statusCode, String message) {

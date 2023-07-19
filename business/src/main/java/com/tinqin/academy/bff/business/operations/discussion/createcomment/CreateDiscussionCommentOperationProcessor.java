@@ -1,6 +1,6 @@
 package com.tinqin.academy.bff.business.operations.discussion.createcomment;
 
-import com.tinqin.academy.bff.api.erorrzzzz.CreateDiscussionCommentError;
+import com.tinqin.academy.bff.api.errors.CreateDiscussionCommentError;
 import com.tinqin.academy.bff.api.generics.Errorz;
 import com.tinqin.academy.bff.api.operations.discussion.createcomment.CreateDiscussionCommentInput;
 import com.tinqin.academy.bff.api.operations.discussion.createcomment.CreateDiscussionCommentOperation;
@@ -44,8 +44,9 @@ public class CreateDiscussionCommentOperationProcessor implements CreateDiscussi
                         })
                         .map(r -> {
                             log.info(String.format(
-                                    "Processor %s completed successfully.", this.getClass().getName()));
-                          return  CreateDiscussionCommentResult.builder()
+                                    "Processor %s completed successfully.",
+                                    this.getClass().getName()));
+                            return CreateDiscussionCommentResult.builder()
                                     .id(r.getId())
                                     .comment(r.getComment())
                                     .userId(r.getUserId())
