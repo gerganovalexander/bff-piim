@@ -1,5 +1,6 @@
 package com.tinqin.academy.bff.security.config;
 
+import com.tinqin.academy.bff.business.operations.authentication.CustomUserDetailsService;
 import com.tinqin.academy.bff.business.operations.authentication.JwtService;
 import com.tinqin.academy.bff.domain.ClientInterpreter;
 import com.tinqin.academy.piim.api.token.findbytoken.FindByTokenInput;

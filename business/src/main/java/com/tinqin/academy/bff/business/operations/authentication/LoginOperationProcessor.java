@@ -6,8 +6,6 @@ import com.tinqin.academy.bff.api.operations.authentication.login.LoginInput;
 import com.tinqin.academy.bff.api.operations.authentication.login.LoginOperation;
 import com.tinqin.academy.bff.api.operations.authentication.login.LoginResult;
 import com.tinqin.academy.bff.domain.ClientInterpreter;
-import com.tinqin.academy.bff.security.config.CustomUserDetailsService;
-import com.tinqin.academy.bff.security.config.JwtService;
 import com.tinqin.academy.piim.api.errors.token.FindAllValidTokenByUserError;
 import com.tinqin.academy.piim.api.token.create.CreateTokenInput;
 import com.tinqin.academy.piim.api.token.findallvalidtokenbyuser.FindAllValidTokenByUserInput;

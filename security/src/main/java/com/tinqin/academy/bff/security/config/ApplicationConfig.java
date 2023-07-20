@@ -1,7 +1,9 @@
 package com.tinqin.academy.bff.security.config;
 
+import com.tinqin.academy.bff.business.operations.authentication.CustomUserDetailsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -13,6 +15,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
 @RequiredArgsConstructor
+@ComponentScan(value = "com.tinqin.academy.bff")
 public class ApplicationConfig {
     private final CustomUserDetailsService customUserDetailsService;
 

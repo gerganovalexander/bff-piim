@@ -1,4 +1,4 @@
-package com.tinqin.academy.bff.security.config;
+package com.tinqin.academy.bff.business.operations.authentication;
 
 import com.tinqin.academy.bff.domain.ClientInterpreter;
 import com.tinqin.academy.piim.api.errors.user.GetUserByEmailError;
