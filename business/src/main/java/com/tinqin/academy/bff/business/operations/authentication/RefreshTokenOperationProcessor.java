@@ -5,7 +5,6 @@ import com.tinqin.academy.bff.api.generics.Errorz;
 import com.tinqin.academy.bff.api.operations.authentication.refreshtoken.RefreshTokenInput;
 import com.tinqin.academy.bff.api.operations.authentication.refreshtoken.RefreshTokenOperation;
 import com.tinqin.academy.bff.api.operations.authentication.refreshtoken.RefreshTokenResult;
-import com.tinqin.academy.bff.domain.ClientInterpreter;
 import io.vavr.control.Either;
 import io.vavr.control.Try;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +17,6 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class RefreshTokenOperationProcessor implements RefreshTokenOperation {
     private final CustomUserDetailsService customUserDetailsService;
-    private final ClientInterpreter clientInterpreter;
     private final JwtService jwtService;
 
     @Override
