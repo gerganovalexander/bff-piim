@@ -1,4 +1,4 @@
-package com.tinqin.academy.bff.security.config;
+package com.tinqin.academy.bff.business.operations.authentication;
 
 import com.tinqin.academy.bff.business.operations.authentication.CustomUserDetailsService;
 import lombok.RequiredArgsConstructor;
