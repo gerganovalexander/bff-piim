@@ -1,10 +1,18 @@
 package com.tinqin.academy.bff.business.operations.authentication;
 
+import com.tinqin.academy.bff.domain.ClientInterpreter;
+import com.tinqin.academy.piim.api.errors.token.FindAllValidTokenByUserError;
+import com.tinqin.academy.piim.api.token.create.CreateTokenInput;
+import com.tinqin.academy.piim.api.token.findallvalidtokenbyuser.FindAllValidTokenByUserInput;
+import com.tinqin.academy.piim.api.token.findallvalidtokenbyuser.FindAllValidTokenByUserResult;
+import com.tinqin.academy.piim.api.token.revoke.RevokeTokenInput;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import io.vavr.control.Either;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -16,7 +24,11 @@ import java.util.Map;
 import java.util.function.Function;
 
 @Service
+@RequiredArgsConstructor
 public class JwtService {
+
+    private final ClientInterpreter clientInterpreter;
+
     @Value("${application.security.jwt.secret-key}")
     private String secretKey;
 
@@ -81,5 +93,26 @@ public class JwtService {
     private Key getSignInKey() {
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         return Keys.hmacShaKeyFor(keyBytes);
+    }
+
+    public void saveUserToken(UserDetails user, String jwtToken) {
+        clientInterpreter.createToken(CreateTokenInput.builder()
+                .token(jwtToken)
+                .tokenType("BEARER")
+                .email(user.getUsername())
+                .build());
+    }
+
+    public void revokeAllUserTokens(UserDetails user) {
+        Either<FindAllValidTokenByUserError, FindAllValidTokenByUserResult> validUserTokens =
+                clientInterpreter.findAllValidTokenByUser(FindAllValidTokenByUserInput.builder()
+                        .email(user.getUsername())
+                        .build());
+        if (validUserTokens.isRight()) {
+            validUserTokens.get().getTokens().parallelStream()
+                    .forEach(tokenOutput -> clientInterpreter.revokeToken(RevokeTokenInput.builder()
+                            .token(tokenOutput.getToken())
+                            .build()));
+        }
     }
 }
