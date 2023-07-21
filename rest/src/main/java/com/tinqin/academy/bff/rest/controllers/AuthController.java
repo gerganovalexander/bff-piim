@@ -2,6 +2,8 @@ package com.tinqin.academy.bff.rest.controllers;
 
 import com.tinqin.academy.bff.api.operations.authentication.login.LoginInput;
 import com.tinqin.academy.bff.api.operations.authentication.login.LoginOperation;
+import com.tinqin.academy.bff.api.operations.authentication.logout.LogoutInput;
+import com.tinqin.academy.bff.api.operations.authentication.logout.LogoutOperation;
 import com.tinqin.academy.bff.api.operations.authentication.refreshtoken.RefreshTokenInput;
 import com.tinqin.academy.bff.api.operations.authentication.refreshtoken.RefreshTokenOperation;
 import com.tinqin.academy.bff.api.operations.authentication.register.RegisterInput;
@@ -23,6 +25,7 @@ public class AuthController extends BaseController {
     private final LoginOperation loginOperation;
     private final RegisterOperation registerOperation;
     private final RefreshTokenOperation refreshTokenOperation;
+    private final LogoutOperation logoutOperation;
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginInput loginInput) {
@@ -39,5 +42,12 @@ public class AuthController extends BaseController {
         String header = request.getHeader(HttpHeaders.AUTHORIZATION);
         return handleOperation(refreshTokenOperation.process(
                 RefreshTokenInput.builder().authenticationHeader(header).build()));
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(HttpServletRequest request) {
+        String header = request.getHeader(HttpHeaders.AUTHORIZATION);
+        return handleOperation(logoutOperation.process(
+                LogoutInput.builder().authenticationHeader(header).build()));
     }
 }

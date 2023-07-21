@@ -6,7 +6,6 @@ import com.tinqin.academy.bff.api.operations.authentication.refreshtoken.Refresh
 import com.tinqin.academy.bff.api.operations.authentication.refreshtoken.RefreshTokenOperation;
 import com.tinqin.academy.bff.api.operations.authentication.refreshtoken.RefreshTokenResult;
 import io.vavr.control.Either;
-import io.vavr.control.Try;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -26,27 +25,26 @@ public class RefreshTokenOperationProcessor implements RefreshTokenOperation {
         if (authHeader == null || authHeader.startsWith("Bearer ")) {
             return Either.left(new RefreshTokenError(400, "No Header"));
         }
+        String refreshToken = authHeader.substring(7);
+        String userEmail = jwtService.extractUsername(refreshToken);
 
-        return Try.of(() -> {
-                    String refreshToken = authHeader.substring(7);
-                    String userEmail = jwtService.extractUsername(refreshToken);
+        try {
+            if (userEmail != null) {
+                UserDetails user = customUserDetailsService.loadUserByUsername(userEmail);
 
-                    if (userEmail != null) {
-                        UserDetails user = customUserDetailsService.loadUserByUsername(userEmail);
-
-                        if (jwtService.isTokenValid(refreshToken, user)) {
-                            String accessToken = jwtService.generateToken(user);
-                            jwtService.revokeAllUserTokens(user);
-                            jwtService.saveUserToken(user, accessToken);
-                            return RefreshTokenResult.builder()
-                                    .accessToken(accessToken)
-                                    .refreshToken(refreshToken)
-                                    .build();
-                        }
-                    }
-                    throw new SecurityException("Nakaraha me, protiv volqta mi");
-                })
-                .toEither()
-                .mapLeft(throwable -> new RefreshTokenError(400, "no token"));
+                if (jwtService.isTokenValid(refreshToken, user)) {
+                    String accessToken = jwtService.generateToken(user);
+                    jwtService.revokeAllUserTokens(user);
+                    jwtService.saveUserToken(user, accessToken);
+                    return Either.right(RefreshTokenResult.builder()
+                            .accessToken(accessToken)
+                            .refreshToken(refreshToken)
+                            .build());
+                }
+            }
+        } catch (RuntimeException e) {
+            return Either.left(new RefreshTokenError(400, "No Header"));
+        }
+        return Either.left(new RefreshTokenError(400, "No Header"));
     }
 }
