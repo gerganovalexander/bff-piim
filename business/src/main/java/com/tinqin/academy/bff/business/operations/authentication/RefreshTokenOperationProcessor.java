@@ -22,7 +22,7 @@ public class RefreshTokenOperationProcessor implements RefreshTokenOperation {
     public Either<Errorz, RefreshTokenResult> process(RefreshTokenInput input) {
 
         String authHeader = input.getAuthenticationHeader();
-        if (authHeader == null || authHeader.startsWith("Bearer ")) {
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             return Either.left(new RefreshTokenError(400, "No Header"));
         }
         String refreshToken = authHeader.substring(7);

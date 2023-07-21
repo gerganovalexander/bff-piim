@@ -1,4 +1,4 @@
-package com.tinqin.academy.bff.security.config;
+package com.tinqin.academy.bff.rest.security;
 
 import com.tinqin.academy.bff.business.operations.authentication.CustomUserDetailsService;
 import com.tinqin.academy.bff.business.operations.authentication.JwtService;
@@ -28,10 +28,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
-        //        if (request.getServletPath().contains("/api/v1/auth")) {
-        //      filterChain.doFilter(request, response);
-        //      return;
-        //    }
+
         final String authHeader = request.getHeader("Authorization");
         final String jwt;
         final String userEmail;
@@ -51,9 +48,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             if (jwtService.isTokenValid(jwt, userDetails) && isTokenValid) {
                 UsernamePasswordAuthenticationToken authToken =
                         new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-                //                authToken.setDetails(
-                //                        new WebAuthenticationDetailsSource().buildDetails(request)
-                //                );
                 SecurityContextHolder.getContext().setAuthentication(authToken);
             }
         }

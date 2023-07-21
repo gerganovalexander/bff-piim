@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -27,9 +28,9 @@ public class LoginOperationProcessor implements LoginOperation {
         return Try.of(() -> {
                     authenticationManager.authenticate(
                             new UsernamePasswordAuthenticationToken(input.getEmail(), input.getPassword()));
-                    var user = customUserDetailsService.loadUserByUsername(input.getEmail());
-                    var jwtToken = jwtService.generateToken(user);
-                    var refreshToken = jwtService.generateRefreshToken(user);
+                    UserDetails user = customUserDetailsService.loadUserByUsername(input.getEmail());
+                    String jwtToken = jwtService.generateToken(user);
+                    String refreshToken = jwtService.generateRefreshToken(user);
                     jwtService.revokeAllUserTokens(user);
                     jwtService.saveUserToken(user, jwtToken);
                     return LoginResult.builder()

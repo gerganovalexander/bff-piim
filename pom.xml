@@ -23,7 +23,6 @@
         <module>rest</module>
         <module>business</module>
         <module>domain</module>
-        <module>security</module>
     </modules>
 
     <properties>

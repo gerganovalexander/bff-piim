@@ -1,4 +1,4 @@
-package com.tinqin.academy.bff.security.config;
+package com.tinqin.academy.bff.rest.security;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
