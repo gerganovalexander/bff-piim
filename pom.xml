@@ -34,6 +34,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <piim.version>0.0.2-SNAPSHOT</piim.version>
         <discussion.version>0.0.1-SNAPSHOT</discussion.version>
+        <pocbe.version>0.0.1-SNAPSHOT</pocbe.version>
     </properties>
 
 
